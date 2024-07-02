@@ -1,7 +1,6 @@
 import {
   Card,
   CardBody,
-  CardFooter,
   Avatar,
   Button
 } from '@nextui-org/react';
@@ -16,16 +15,25 @@ export default function CharacterCard({
   playingId,
   handlePlay
 }) {
-  const router = useRouter();
   const isPlaying = playingId == character.character_id;
-
+  const router = useRouter(); // 初始化 useRouter
   function handlePress() {
     return handlePlay(character.character_id, character.audio_url);
   }
 
   return (
-    <Card className="p-2.5">
-      <CardBody className="p-0 text-center flex-row gap-2 md:flex-col">
+    <Card css={{ boxShadow: 'none' }} className="p-2.5 rounded-none !shadow-none"  onClick={() => {
+      const compressedCharacter = lz.compressToEncodedURIComponent(
+        JSON.stringify(character)
+      );
+      router.push(`/conversation?character=${compressedCharacter}`);
+    }}>
+      <CardBody className="p-0 text-center flex-row  md:flex-col" onClick={() => {
+      const compressedCharacter = lz.compressToEncodedURIComponent(
+        JSON.stringify(character)
+      );
+      router.push(`/conversation?character=${compressedCharacter}`);
+    }}>
         <Avatar
           radius="sm"
           src={character.image_url}
@@ -56,17 +64,6 @@ export default function CharacterCard({
           </div>
         </div>
       </CardBody>
-      <CardFooter className="mt-5">
-        <Button
-          className="w-full font-light bg-default/40 hover:opacity-80"
-          onPress={() => {
-            const compressedCharacter = lz.compressToEncodedURIComponent(
-              JSON.stringify(character)
-            );
-            router.push(`/conversation?character=${compressedCharacter}`);
-          }}
-        >Chat with me</Button>
-      </CardFooter>
     </Card>
   );
 }

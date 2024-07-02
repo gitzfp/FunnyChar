@@ -59,7 +59,8 @@ async def get_current_user(token: str):
         decoded_token = auth.verify_id_token(token)
     except FirebaseError as e:
         logger.info(f"Receveid invalid token: {token} with error {e}")
-        raise HTTPException(status_code=401, detail="Invalid authentication credentials")
+        raise HTTPException(
+            status_code=401, detail="Invalid authentication credentials")
 
     return decoded_token["uid"]
 
@@ -81,7 +82,8 @@ async def check_session_auth(session_id: str, user_id: str, db: Session) -> Sess
         )
     try:
         original_chat = await asyncio.to_thread(
-            db.query(Interaction).filter(Interaction.session_id == session_id).first
+            db.query(Interaction).filter(
+                Interaction.session_id == session_id).first
         )
     except Exception as e:
         logger.info(f"Failed to lookup session {session_id} with error {e}")
@@ -107,7 +109,7 @@ async def websocket_endpoint(
     websocket: WebSocket,
     session_id: str = Path(...),
     llm_model: str = Query("gpt-3.5-turbo-16k"),
-    language: str = Query("en-US"),
+    language: str = 'zh-cn',
     token: str = Query(None),
     character_id: str = Query(None),
     platform: str = Query(None),
@@ -134,10 +136,12 @@ async def websocket_endpoint(
             return
     session_auth_result = await check_session_auth(session_id=session_id, user_id=user_id, db=db)
     if not session_auth_result.is_authenticated_user:
-        logger.info(f"User #{user_id} is not authorized to access session {session_id}")
+        logger.info(
+            f"User #{user_id} is not authorized to access session {session_id}")
         await websocket.close(code=1008, reason="Unauthorized")
         return
-    logger.info(f"User #{user_id} is authorized to access session {session_id}")
+    logger.info(
+        f"User #{user_id} is authorized to access session {session_id}")
 
     llm = get_llm(model=llm_model)
     await manager.connect(websocket)
@@ -184,7 +188,8 @@ async def handle_receive(
     try:
         conversation_history = ConversationHistory()
         if load_from_existing_session:
-            logger.info(f"User #{user_id} is loading from existing session {session_id}")
+            logger.info(
+                f"User #{user_id} is loading from existing session {session_id}")
             await asyncio.to_thread(conversation_history.load_from_db, session_id=session_id, db=db)
 
         # 0. Receive client platform info (web, mobile, terminal)
@@ -210,7 +215,8 @@ async def handle_receive(
         character_name_list, character_id_list = zip(*character_list)
         while not character:
             character_message = "\n".join(
-                [f"{i+1} - {character}" for i, character in enumerate(character_name_list)]
+                [f"{i+1} - {character}" for i,
+                    character in enumerate(character_name_list)]
             )
             await manager.send_message(
                 message=f"Select your character by entering the corresponding number:\n"
@@ -231,7 +237,8 @@ async def handle_receive(
                         websocket=websocket,
                     )
                     continue
-                character = catalog_manager.get_character(character_id_list[selection - 1])
+                character = catalog_manager.get_character(
+                    character_id_list[selection - 1])
                 character_id = character_id_list[selection - 1]
 
         if character.tts:
@@ -257,7 +264,7 @@ async def handle_receive(
                 tts_event=tts_event,
                 voice_id=character.voice_id,
                 first_sentence=True,
-                language=language,
+                language='zh-cn',
                 priority=0,
             )
         )
@@ -306,7 +313,7 @@ async def handle_receive(
                 if msg_data.startswith("[!"):
                     command_end = msg_data.find("]")
                     command = msg_data[2:command_end]
-                    command_content = msg_data[command_end + 1 :]
+                    command_content = msg_data[command_end + 1:]
                     if command == "JOURNAL_MODE":
                         journal_mode = command_content == "true"
                     elif command == "ADD_SPEAKER":
@@ -380,7 +387,8 @@ async def handle_receive(
                         )
                         if not journal_mode
                         else None,
-                        metadata={"message_id": message_id, "user_id": user_id},
+                        metadata={"message_id": message_id,
+                                  "user_id": user_id},
                     )
                 )
                 tts_task.add_done_callback(task_done_callback)
@@ -441,8 +449,10 @@ async def handle_receive(
                     )
                     if transcripts:
                         audio_cache += transcripts
-                    cached_duration = sum([transcript.duration for transcript in audio_cache])
-                    cached_elapse = time.time() - audio_cache[0].timestamp if audio_cache else 0
+                    cached_duration = sum(
+                        [transcript.duration for transcript in audio_cache])
+                    cached_elapse = time.time() - \
+                        audio_cache[0].timestamp if audio_cache else 0
                     if cached_duration > 30 or cached_elapse > 60:
                         audio_cache = await journal_transcribe(audio_cache)
                         journal_history += audio_cache
@@ -541,7 +551,8 @@ async def handle_receive(
                         )
                         if not journal_mode
                         else None,
-                        metadata={"message_id": message_id, "user_id": user_id},
+                        metadata={"message_id": message_id,
+                                  "user_id": user_id},
                     )
                 )
                 tts_task.add_done_callback(task_done_callback)

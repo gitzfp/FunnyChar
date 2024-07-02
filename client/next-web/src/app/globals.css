@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
+/* :root {
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;
   --background-end-rgb: 255, 255, 255;
@@ -14,7 +14,7 @@
     --background-start-rgb: 0, 0, 0;
     --background-end-rgb: 0, 0, 0;
   }
-}
+} */
 
 .conversation_container .react-input-emoji--container {
   background: transparent;
@@ -33,7 +33,7 @@
 }
 
 .conversation_container .react-input-emoji--button {
-  position:absolute;
+  position: absolute;
   top: 42px;
   left: 52px;
   height: 40px;
@@ -43,7 +43,7 @@
 }
 
 .conversation_container .react-input-emoji--button:hover {
-  background: rgba(63,63,70,0.4);
+  background: rgba(63, 63, 70, 0.4);
 }
 
 .journal_mode .react-input-emoji--button {

@@ -65,6 +65,7 @@ export const createWebsocketSlice = (set, get) => ({
         console.log('should not play audio');
         return;
       }
+      console.log('开始播放===========')
       get().pushAudioQueue(event.data);
       console.log(
         'audio arrival: ',

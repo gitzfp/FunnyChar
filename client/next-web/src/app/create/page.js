@@ -1,14 +1,6 @@
 'use client';
 
-import {
-  Button,
-  Input,
-  Textarea,
-  Radio,
-  RadioGroup,
-  Tooltip,
-  Link,
-} from '@nextui-org/react';
+import { Button, Input, Textarea, Radio, RadioGroup, Tooltip, Link } from '@nextui-org/react';
 import { MdInfoOutline, MdArrowBack } from 'react-icons/md';
 import NextLink from 'next/link';
 import Header from '../_components/Header';
@@ -41,28 +33,27 @@ export default function Create() {
   return (
     <>
       <Header />
-      <form className="py-5 px-4 flex flex-col justify-center gap-5 md:w-unit-9xl md:mx-auto lg:w-[892px] lg:gap-8">
+      <form className='py-5 px-4 flex flex-col justify-center gap-5 md:w-unit-9xl md:mx-auto lg:w-[892px] lg:gap-8'>
         <p>
           <Link
-            color="foreground"
+            color='foreground'
             as={NextLink}
             href={{
               pathname: '/',
-              query: { tab: 'myCharacters' },
             }}
           >
-            <MdArrowBack className="mr-2" />
+            <MdArrowBack className='mr-2' />
             Back
           </Link>
         </p>
-        <h1 className="text-center text-2xl font-medium">Create a character</h1>
+        <h1 className='text-center text-2xl font-medium'>Create a character</h1>
         <AvatarUploader />
         <div>
           <Input
-            type="text"
-            label="Name"
-            labelPlacement="outside"
-            placeholder="Name your character"
+            type='text'
+            label='Name'
+            labelPlacement='outside'
+            placeholder='Name your character'
             value={formData.name}
             onValueChange={(value) =>
               setFormData({
@@ -84,9 +75,9 @@ export default function Create() {
         <SystemPrompt />
         <div>
           <Textarea
-            label="User Prompt"
-            labelPlacement="outside"
-            placeholder=""
+            label='User Prompt'
+            labelPlacement='outside'
+            placeholder=''
             classNames={{
               label: 'text-lg',
               inputWrapper: [
@@ -105,44 +96,40 @@ export default function Create() {
           />
         </div>
         <TTSVoice />
-        <div className="flex flex-col gap-1">
-          <h4 className="font-medium flex flex-row gap-1 items-center">
+        <div className='flex flex-col gap-1'>
+          <h4 className='font-medium flex flex-row gap-1 items-center'>
             Visibility
             <Tooltip
               content={
-                <div className="w-fit h-fit text-tiny py-1 px-1">
-                  If set to public, the character will be visible to everyone
-                  after review.
+                <div className='w-fit h-fit text-tiny py-1 px-1'>
+                  If set to public, the character will be visible to everyone after review.
                 </div>
               }
             >
               <Button
                 isIconOnly
-                size="sm"
-                variant="light"
-                className="p-0 min-w-unit-5 w-5 min-h-unit-5 h-5"
+                size='sm'
+                variant='light'
+                className='p-0 min-w-unit-5 w-5 min-h-unit-5 h-5'
               >
-                <MdInfoOutline size="1.5em" />
+                <MdInfoOutline size='1.5em' />
               </Button>
             </Tooltip>
           </h4>
           <RadioGroup
-            orientation="horizontal"
+            orientation='horizontal'
             value={formData.visibility}
             onValueChange={(value) => setFormData({ visibility: value })}
           >
-            <Radio value="public">Public</Radio>
-            <Radio value="private">Private</Radio>
+            <Radio value='public'>Public</Radio>
+            <Radio value='private'>Private</Radio>
           </RadioGroup>
         </div>
         <div>
-          <Button
-            onPress={handleSubmit}
-            className="bg-real-contrastBlue w-full"
-          >
+          <Button onPress={handleSubmit} className='bg-real-contrastBlue w-full'>
             Submit
           </Button>
-          <p className="text-tiny text-warning">
+          <p className='text-tiny text-warning'>
             *It may take 30 seconds for the new character to be available.
           </p>
         </div>

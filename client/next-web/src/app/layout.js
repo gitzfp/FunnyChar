@@ -10,8 +10,7 @@ const prompt = Prompt({
 
 export const metadata = {
   title: 'RealChar.',
-  description:
-    'Create, customize and talk to your AI Character/Companion in realtime',
+  description: 'Create, customize and talk to your AI Character/Companion in realtime',
 };
 
 export default function RootLayout({ children }) {
@@ -19,7 +18,7 @@ export default function RootLayout({ children }) {
     <html lang='en' className='dark'>
       <body className={prompt.className}>
         <Providers>
-          <main>{children}</main>
+          {children}
         </Providers>
       </body>
     </html>

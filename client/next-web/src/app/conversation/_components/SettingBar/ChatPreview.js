@@ -8,7 +8,6 @@ export default function ChatPreview() {
 
   return (
     <ul className="border-2 border-real-blue-500/30 rounded-2xl bg-white/10 max-h-[40vh] overflow-scroll">
-      <li className="p-3 md:p-6 font-normal border-b-2 border-real-blue-500/30">Chat with {character.name}</li>
       {
         chatContent.map((line) => (
           <li

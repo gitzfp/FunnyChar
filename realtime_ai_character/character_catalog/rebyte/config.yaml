@@ -23,9 +23,9 @@ user: |
   {query}
 
 text_to_speech_use: XTTS
-voice_id: rebyte
+voice_id: yuli
 visibility: public
-order: 0
+order: 1
 
 rebyte_api_project_id: d4e521a67bb8189c2189
 rebyte_api_agent_id: 23536d65c54f4d7680cd

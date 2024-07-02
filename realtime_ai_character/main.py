@@ -11,6 +11,18 @@ from realtime_ai_character.twilio.websocket import twilio_router
 from realtime_ai_character.utils import ConnectionManager
 from realtime_ai_character.websocket_routes import router as websocket_router
 
+import ssl
+from aiohttp import TCPConnector
+
+# Monkey Patching
+original_sslcontext = ssl.create_default_context
+
+
+def patched_sslcontext(*args, **kwargs):
+    context = original_sslcontext(*args, **kwargs)
+    # 允许 TLS in TLS
+    return context
+
 
 app = FastAPI()
 

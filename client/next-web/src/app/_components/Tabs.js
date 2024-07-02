@@ -7,6 +7,7 @@ import { useAuthContext } from '@/context/AuthContext';
 import { useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useAppStore } from '@/zustand/store';
+import Link from 'next/link';
 
 export default function Tabs({ characters }) {
   const { user } = useAuthContext();
@@ -30,28 +31,29 @@ export default function Tabs({ characters }) {
 
   return (
     <>
-      <div className='flex flex-row justify-center mt-10'>
-        <div className='w-[630px] grid grid-cols-3 gap-5 border-2 rounded-full p-1 border-tab'>
-          <TabButton isSelected={tabNow === 'explore'} handlePress={() => setTabNow('explore')}>
-            Explore
-          </TabButton>
-          <TabButton isSelected={tabNow === 'community'} handlePress={() => setTabNow('community')}>
-            Community
-          </TabButton>
-          <TabButton
-            isSelected={user && tabNow === 'myCharacters'}
-            isDisabled={user == null}
-            handlePress={() => setTabNow('myCharacters')}
-          >
-            My Characters
-          </TabButton>
-        </div>
-      </div>
       <ExploreTab
         characters={charactersShown(tabNow)}
         isDisplay={tabNow === 'explore' || tabNow === 'community'}
       />
       {user && <MyTab isDisplay={tabNow === 'myCharacters'} />}
+      <div className='flex flex-row justify-center items-center fixed bottom-0 w-full h-10  border-2 p-10 border-tab bg-white'>
+        <TabButton isSelected={tabNow === 'explore'} handlePress={() => setTabNow('explore')}>
+          对话
+        </TabButton>
+        <TabButton isSelected={tabNow === 'community'} handlePress={() => setTabNow('community')}>
+          发现
+        </TabButton>
+        <Link href='/create'>
+          <TabButton isSelected={tabNow === 'create'}>创建</TabButton>
+        </Link>
+        <TabButton
+          isSelected={user && tabNow === 'myCharacters'}
+          isDisabled={user == null}
+          handlePress={() => setTabNow('myCharacters')}
+        >
+          我的
+        </TabButton>
+      </div>
     </>
   );
 }

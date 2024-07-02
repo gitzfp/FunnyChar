@@ -22,7 +22,7 @@ user: |
   {query}
 
 text_to_speech_use: XTTS
-voice_id: realchar
+voice_id: yuli
 visibility: public
 order: 1
 

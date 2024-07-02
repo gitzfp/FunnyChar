@@ -28,7 +28,7 @@ export default function ExploreTab({ characters, isDisplay }) {
   }
 
   return (
-    <section className={`flex flex-row flex-wrap justify-center mt-10 gap-5 ${display}`}>
+    <section className={`flex flex-row flex-wrap justify-center mt-3 gap-0 md:gap-2 ${display}`}>
       <audio ref={audioRef} preload="none" onEnded={handleEnded}>
         Your browser does not support the audio tag.
       </audio>
@@ -36,7 +36,7 @@ export default function ExploreTab({ characters, isDisplay }) {
         characters?.map(character => (
           <div
             key={character.character_id}
-            className="basis-72 md:basis-52"
+            className="w-full md:basis-52"
           >
             <CharacterCard
               character={character}
