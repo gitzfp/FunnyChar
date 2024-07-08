@@ -9,7 +9,27 @@ import yaml
 from dotenv import load_dotenv
 from firebase_admin import auth
 from langchain.text_splitter import CharacterTextSplitter
-from llama_index import SimpleDirectoryReader
+# 确保导入路径正确
+try:
+    from llama_index.core import SimpleDirectoryReader
+except ImportError:
+    class SimpleDirectoryReader:
+        def __init__(self, directory_path):
+            self.directory_path = directory_path
+
+        def load_data(self):
+            documents = []
+            for file in Path(self.directory_path).glob("*.txt"):
+                with open(file, "r", encoding="utf-8") as f:
+                    documents.append(SimpleDocument(
+                        text=f.read(), id_=str(file)))
+            return documents
+
+    class SimpleDocument:
+        def __init__(self, text, id_):
+            self.text = text
+            self.id_ = id_
+
 from readerwriterlock import rwlock
 
 from realtime_ai_character.database.chroma import get_chroma
@@ -17,7 +37,6 @@ from realtime_ai_character.database.connection import get_db
 from realtime_ai_character.logger import get_logger
 from realtime_ai_character.models.character import Character as CharacterModel
 from realtime_ai_character.utils import Character, Singleton
-
 
 load_dotenv()
 logger = get_logger(__name__)
@@ -33,7 +52,8 @@ class CatalogManager(Singleton):
         else:
             self.db = get_chroma(embedding=False)
             overwrite = False
-            logger.warning("OVERWRITE_CHROMA disabled due to OPENAI_API_KEY not set")
+            logger.warning(
+                "OVERWRITE_CHROMA disabled due to OPENAI_API_KEY not set")
         self.sql_db = next(get_db())
         self.sql_load_interval = 30
         self.sql_load_lock = rwlock.RWLockFair()
@@ -50,9 +70,11 @@ class CatalogManager(Singleton):
         if overwrite:
             logger.info("Persisting data in the chroma.")
             self.db.persist()
-        logger.info(f"Total document load: {self.db._client.get_collection('llm').count()}")
+        logger.info(
+            f"Total document load: {self.db._client.get_collection('llm').count()}")
         self.run_load_sql_db_thread = True
-        self.load_sql_db_thread = threading.Thread(target=self.load_sql_db_loop)
+        self.load_sql_db_thread = threading.Thread(
+            target=self.load_sql_db_loop)
         self.load_sql_db_thread.daemon = True
         self.load_sql_db_thread.start()
 
@@ -99,9 +121,24 @@ class CatalogManager(Singleton):
             return character_name
 
     def load_data(self, character_name: str, data_path: Path):
+        if SimpleDirectoryReader is None:
+            logger.warning(
+                f"SimpleDirectoryReader not available. Skipping data load for {character_name}.")
+            return
+
         loader = SimpleDirectoryReader(data_path.absolute().as_posix())
         documents = loader.load_data()
-        text_splitter = CharacterTextSplitter(separator="\n", chunk_size=500, chunk_overlap=100)
+
+        if not documents:
+            logger.warning(
+                f"No documents found in {data_path} for character {character_name}.")
+            return
+
+        logger.info(
+            f"Found {len(documents)} documents for character {character_name} in {data_path}.")
+
+        text_splitter = CharacterTextSplitter(
+            separator="\n", chunk_size=500, chunk_overlap=100)
         docs = text_splitter.create_documents(
             texts=[d.text for d in documents],
             metadatas=[
@@ -112,7 +149,15 @@ class CatalogManager(Singleton):
                 for d in documents
             ],
         )
+
+        if not docs:
+            logger.warning(
+                f"No documents were created for character {character_name}.")
+            return
+
         self.db.add_documents(docs)
+        logger.info(
+            f"Added {len(docs)} documents to the database for character {character_name}.")
 
     def load_characters(self, source: str, overwrite: bool):
         """
@@ -132,15 +177,18 @@ class CatalogManager(Singleton):
         else:
             raise ValueError(f"Invalid source: {source}")
 
-        directories = [d for d in path.iterdir() if d.is_dir() and d.name not in excluded_dirs]
+        directories = [d for d in path.iterdir() if d.is_dir()
+                       and d.name not in excluded_dirs]
 
         for directory in directories:
             character_name = self.load_character(directory, source)
             if character_name and overwrite:
-                logger.info("Overwriting data for character: " + character_name)
+                logger.info(
+                    "Overwriting data for character: " + character_name)
                 self.load_data(character_name, directory / "data")
 
-        logger.info(f"Loaded {len(self.characters)} characters: IDs {list(self.characters.keys())}")
+        logger.info(
+            f"Loaded {len(self.characters)} characters: IDs {list(self.characters.keys())}")
 
     def load_character_from_sql_database(self):
         logger.info("Started loading characters from SQL database")
@@ -163,7 +211,7 @@ class CatalogManager(Singleton):
                         if os.getenv("USE_AUTH") == "true"
                         else "anonymous author"
                     )
-                    self.author_name_cache[character_model.author_id] = author_name  # type: ignore
+                    self.author_name_cache[character_model.author_id] = author_name
                 else:
                     author_name = self.author_name_cache[character_model.author_id]
                 character = Character(
@@ -186,7 +234,8 @@ class CatalogManager(Singleton):
                 )
                 self.characters[character_model.id] = character  # type: ignore
                 # TODO: load context data from storage
-        logger.info(f"Loaded {len(character_models)} characters from sql database")
+        logger.info(
+            f"Loaded {len(character_models)} characters from sql database")
 
 
 def get_catalog_manager() -> CatalogManager:

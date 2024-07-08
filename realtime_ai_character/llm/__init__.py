@@ -13,6 +13,11 @@ load_dotenv()
 def get_llm(model="gpt-3.5-turbo-16k") -> LLM:
     model = os.getenv("LLM_MODEL_USE", model)
 
+    if model.startswith("qwen"):
+        from realtime_ai_character.llm.qwen_llm import QwenLlm
+
+        return QwenLlm(model=model)
+
     if model.startswith("gpt"):
         from realtime_ai_character.llm.openai_llm import OpenaiLlm
 

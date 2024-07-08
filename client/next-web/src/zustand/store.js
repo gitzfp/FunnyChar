@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 import { createSettingSlice } from './slices/settingSlice';
 import { createChatSlice } from './slices/chatSlice';
 import { createWebsocketSlice } from '@/zustand/slices/websocketSlice';
