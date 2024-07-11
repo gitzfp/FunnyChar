@@ -38,7 +38,6 @@ jupyter>=1.0.0
 langchain-community==0.0.20
 langchain-core
 langchain-experimental
-llama-index
 llama-index-readers-json
 llama-index-retrievers-bm25
 moviepy

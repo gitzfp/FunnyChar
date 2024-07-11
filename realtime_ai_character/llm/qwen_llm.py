@@ -35,9 +35,6 @@ class QwenLlm(LLM):
         self.config = {'model': 'qwen-max', 'model_server': 'dashscope'}
         self.db = self.get_chroma()
 
-        logger.info(
-            f"Initialized QwenLlm with model: {model}, config: {self.config}")
-
     def get_chroma(self):
         embeddings = DashScopeEmbeddings(
             model="text-embedding-v1", dashscope_api_key=os.environ['DASHSCOPE_API_KEY'])
@@ -87,7 +84,6 @@ class QwenLlm(LLM):
         if audioCallback is not None:
             callbacks.append(audioCallback)
 
-        logger.info("Generating response from Qwen model...")
         bot = RolePlay(
             function_list=[], llm=self.config, instruction=context)
         response = bot.run(user_input)
@@ -95,7 +91,6 @@ class QwenLlm(LLM):
         text = ''
         for chunk in response:
             text += chunk
-        logger.info(f"qwen response: {text}=========metadata: {metadata}")
 
         ai_message = AIMessage(content=text, response_metadata={
                                'finish_reason': 'stop'})
@@ -103,11 +98,10 @@ class QwenLlm(LLM):
                                          'finish_reason': 'stop'}, message=ai_message)
         run_info = RunInfo(run_id=uuid4())
 
-        return {
-            'generations': [[chat_generation]],
-            'llm_output': {'token_usage': {}, 'model_name': 'qwen-max'},
-            'run': [run_info]
-        }
+        logger.info(
+            f"qwen response: {text}=========metadata: {metadata} run_info: {run_info} text: {chat_generation.text}")
+
+        return chat_generation.text
 
     def _generate_context(self, query, character: Character) -> str:
         logger.info(
