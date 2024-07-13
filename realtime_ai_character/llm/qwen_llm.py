@@ -1,5 +1,5 @@
 import os
-from typing import Optional, List, Dict
+from typing import Optional, List, Dict, Any
 from uuid import uuid4
 
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
@@ -58,52 +58,64 @@ class QwenLlm(LLM):
         character: Character,
         callback: AsyncCallbackTextHandler,
         audioCallback: Optional[AsyncCallbackAudioHandler] = None,
-        metadata: Optional[Dict] = None,
+        metadata: Optional[Dict[str, Any]] = None,
         *args,
         **kwargs,
-    ) -> Dict:
-        logger.info(f"Received user input: {user_input}")
-        logger.debug(f"History before adding user input: {history}")
-        logger.debug(f"Character configuration: {character}")
+    ) -> str:
+        try:
+            logger.info(f"Received user input: {user_input}")
+            logger.debug(f"History before adding user input: {history}")
+            logger.debug(f"Character configuration: {character}")
 
-        # 1. Generate context
-        context = self._generate_context(user_input, character)
-        logger.debug(f"Generated context: {context}")
+            # 1. Generate context
+            context = self._generate_context(user_input, character)
+            logger.debug(f"Generated context: {context}")
 
-        # 2. Add user input to history
-        history.append(
-            HumanMessage(
-                content=character.llm_user_prompt.format(
-                    context=context, query=user_input)
+            # 2. Add user input to history
+            history.append(
+                HumanMessage(
+                    content=character.llm_user_prompt.format(
+                        context=context, query=user_input)
+                )
             )
-        )
-        logger.debug(f"History after adding user input: {history}")
+            logger.debug(f"History after adding user input: {history}")
 
-        # 3. Generate response
-        callbacks = [callback, StreamingStdOutCallbackHandler()]
-        if audioCallback is not None:
-            callbacks.append(audioCallback)
+            # 3. Generate response
+            callbacks = [callback, StreamingStdOutCallbackHandler()]
+            if audioCallback is not None:
+                callbacks.append(audioCallback)
 
-        bot = RolePlay(
-            function_list=[], llm=self.config, instruction=context)
-        response = bot.run(user_input)
+            bot = RolePlay(
+                function_list=[], llm=self.config, instruction=context)
+            response = bot.run(user_input)  # 确保这里是同步调用
 
-        text = ''
-        for chunk in response:
-            text += chunk
+            text = ''
+            for chunk in response:
+                text += chunk
+                await callback.on_new_token(chunk)  # 调用callback
 
-        ai_message = AIMessage(content=text, response_metadata={
-                               'finish_reason': 'stop'})
-        chat_generation = ChatGeneration(text=text, generation_info={
-                                         'finish_reason': 'stop'}, message=ai_message)
-        run_info = RunInfo(run_id=uuid4())
+            ai_message = AIMessage(content=text, response_metadata={
+                                   'finish_reason': 'stop'})
+            chat_generation = ChatGeneration(text=text, generation_info={
+                                             'finish_reason': 'stop'}, message=ai_message)
+            run_id = uuid4()
+            run_info = RunInfo(run_id)
 
-        logger.info(
-            f"qwen response: {text}=========metadata: {metadata} run_info: {run_info} text: {chat_generation.text}")
+            # Append the end identifier to the response text
+            text += f"[end={run_info.run_id}]"
+            # callback.on_new_token(f"[end={run_info.run_id}]")
+            await callback.on_llm_end(text)
 
-        return chat_generation.text
+            logger.info(
+                f"qwen response: {text}=========metadata: {metadata} run_info: {run_info} text: {chat_generation.text}")
 
-    def _generate_context(self, query, character: Character) -> str:
+            return chat_generation.text
+
+        except Exception as e:
+            logger.error(f"An error occurred in achat: {e}")
+            raise
+
+    def _generate_context(self, query: str, character: Character) -> str:
         logger.info(
             f"Generating context for query: {query} and character: {character.name}")
         docs = self.db.similarity_search(query)
