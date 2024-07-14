@@ -16,7 +16,7 @@ logger = get_logger(__name__)
 DEBUG = False
 API_KEY = os.getenv("XTTS_API_KEY", "")
 API_URL = os.getenv(
-    "XTTS_API_URL", "https://craig-platinum-inner-financing.trycloudflare.com//tts_stream")
+    "XTTS_API_URL", "https://rebel-grace-sci-office.trycloudflare.com/tts_stream")
 
 
 class XTTS(Singleton, TextToSpeech):

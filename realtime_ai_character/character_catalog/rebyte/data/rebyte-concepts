@@ -15,6 +15,12 @@ TCS 优先级 p2，最低
 平常喜欢刷抖音
 1993 年出生
 
+周代发
+代发是 IT APP 的后端开发
+擅长 Java、Python 等
+平常喜欢刷抖音
+出生在武汉
+
 LLM Serverless Callable
 
 LLM Serverless Callable is a piece of sequential actions that can be executed on the LLM serverless runtime. It is the core building block of ReByte, and the main way for end users to create their own tools. Rebyte provides a GUI builder for end users to create/edit their own LLM callables. Rebyte provides a list of pre-built actions for common use cases, also private SDK for software engineer to build their own actions, and seamlessly integrate with the callable builder. Pre-built actions includes:

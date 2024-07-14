@@ -117,14 +117,15 @@ class AsyncCallbackAudioHandler(AsyncCallbackHandler):
         if punctuation and self.current_sentence.strip():
             first_sentence = self.sentence_idx == 0
             if first_sentence:
-                timer.log("LLM First Sentence", lambda: timer.start("TTS First Sentence"))
+                timer.log("LLM First Sentence",
+                          lambda: timer.start("TTS First Sentence"))
             await self.text_to_speech.stream(
                 text=self.current_sentence.strip(),
                 websocket=self.websocket,
                 tts_event=self.tts_event,
                 voice_id=self.voice_id,
                 first_sentence=first_sentence,
-                language=self.language,
+                language=self.language or 'zh-cn',
                 sid=self.twilio_stream_id,
                 platform=self.platform,
                 priority=self.sentence_idx,
@@ -148,7 +149,8 @@ class AsyncCallbackAudioHandler(AsyncCallbackHandler):
 
     def text_regulator(self, text):
         pattern = (
-            r"[\u200B\u200C\u200D\u200E\u200F\uFEFF\u00AD\u2060\uFFFC\uFFFD]"  # Format characters
+            # Format characters
+            r"[\u200B\u200C\u200D\u200E\u200F\uFEFF\u00AD\u2060\uFFFC\uFFFD]"
             r"|[\uFE00-\uFE0F]"  # Variation selectors
             r"|[\uE000-\uF8FF]"  # Private use area
             r"|[\uFFF0-\uFFFF]"  # Specials

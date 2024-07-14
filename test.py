@@ -8,6 +8,8 @@ from langchain.schema import BaseMessage, HumanMessage
 from realtime_ai_character.llm.base import AsyncCallbackAudioHandler, AsyncCallbackTextHandler, LLM
 from realtime_ai_character.logger import get_logger
 from realtime_ai_character.utils import Character, timed
+from langchain_community.embeddings import DashScopeEmbeddings
+from langchain_community.vectorstores import Chroma
 
 logger = get_logger(__name__)
 os.environ['DASHSCOPE_API_KEY'] = "sk-b9bbfde1f3fb4961aeb3aa0d1e333d9c"
@@ -87,12 +89,77 @@ class QwenLlm(LLM):
 
         return text
 
+    def get_chroma(self):
+        embeddings = DashScopeEmbeddings(
+            model="text-embedding-v1", dashscope_api_key=os.environ['DASHSCOPE_API_KEY'])
 
-# 在你的入口文件中设置日志级别和格式
+        chroma = Chroma(
+            collection_name="llm",
+            embedding_function=embeddings,
+            persist_directory="./chroma.db",
+        )
+        return chroma
+
+    def get_all_documents(self):
+        # Custom method to retrieve all documents
+        try:
+            return self.db._collection.find({})
+        except Exception as e:
+            logger.error(f"Error retrieving all documents: {e}")
+            return []
+
+    def print_all_documents(self):
+        try:
+            logger.info("Initializing Chroma database...")
+            self.db = self.get_chroma()
+            logger.info("Chroma database initialized successfully.")
+
+            logger.info("Starting similarity search with an empty query...")
+            # 添加try-except块以捕获similarity_search方法中的具体错误
+            try:
+                all_docs = self.get_all_documents()
+            except Exception as e:
+                logger.error(f"Error during similarity search: {e}")
+                return
+            logger.debug(
+                f"Search results type: {type(all_docs)}, length: {len(all_docs)}")
+            logger.debug(f"Search results content: {all_docs}")
+
+            if not all_docs:
+                logger.warning("No documents found in similarity search.")
+                return  # 提前退出，避免后续操作
+
+            for i, doc in enumerate(all_docs):
+                try:
+                    logger.debug(f"Processing document {i+1}/{len(all_docs)}")
+
+                    # 打印每个文档的详细信息以进行调试
+                    logger.debug(f"Document {i+1} metadata: {doc.metadata}")
+                    logger.debug(f"Document {i+1} content: {doc.page_content}")
+
+                    # 检查 doc 是否包含所有必要的字段
+                    if 'id' not in doc.metadata or 'character_name' not in doc.metadata or not hasattr(doc, 'page_content'):
+                        logger.warning(
+                            f"Document {i+1} is missing required fields.")
+                        continue
+
+                    print(f"Document {i+1}/{len(all_docs)}:")
+                    print(f"Document ID: {doc.metadata['id']}")
+                    print(
+                        f"Character Name: {doc.metadata.get('character_name', 'N/A')}")
+                    print(f"Content: {doc.page_content}")
+                    print("-----")
+                except KeyError as e:
+                    logger.error(f"KeyError for document {i+1}: {e}")
+                except IndexError as e:
+                    logger.error(f"IndexError for document {i+1}: {e}")
+                except Exception as e:
+                    logger.error(f"Unexpected error for document {i+1}: {e}")
+        except Exception as e:
+            logger.error(f"An unexpected error occurred: {e}")
+
+
+# 调用示例
 if __name__ == "__main__":
-    logging.basicConfig(
-        level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-    logger = get_logger(__name__)
-
-    # 你的应用程序逻辑
-    # e.g., app.run()
+    qwen_llm = QwenLlm(model="qwen-max")
+    qwen_llm.print_all_documents()
