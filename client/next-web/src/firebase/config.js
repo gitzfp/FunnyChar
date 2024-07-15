@@ -13,7 +13,7 @@ import { initializeApp, getApps } from "firebase/app";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCf8ROnYUah-HXe-jqYt8fjP6QditGuo2s",
-  authDomain: "localhost",
+  authDomain: "character-speak.firebaseapp.com",
   projectId: "character-speak",
   storageBucket: "character-speak.appspot.com",
   messagingSenderId: "1049458837614",

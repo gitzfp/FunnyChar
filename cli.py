@@ -62,13 +62,14 @@ def docker_run(name, db_file):
                 "-p",
                 "8000:8000",
                 "-v",
-                f"{os.path.abspath(db_file)}:/realtime_ai_character/test.db",
+                f"{os.path.abspath(db_file)}:/characters/test.db",
                 name,
             ]
         )
     else:
         subprocess.run(
-            ["docker", "run", "--env-file", ".env", "--name", name, "-p", "8000:8000", name]
+            ["docker", "run", "--env-file", ".env",
+                "--name", name, "-p", "8000:8000", name]
         )
 
 
@@ -91,7 +92,7 @@ def run_uvicorn(args):
     subprocess.run(
         [
             "uvicorn",
-            "realtime_ai_character.main:app",
+            "characters.main:app",
             "--ws-ping-interval",
             "60",
             "--ws-ping-timeout",
@@ -192,7 +193,8 @@ def docker_next_web_run(file, image_name):
 
 
 def image_exists(name):
-    result = subprocess.run(["docker", "image", "inspect", name], capture_output=True, text=True)
+    result = subprocess.run(
+        ["docker", "image", "inspect", name], capture_output=True, text=True)
     return result.returncode == 0
 
 

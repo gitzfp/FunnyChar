@@ -5,9 +5,9 @@ from typing import Optional
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 from langchain.schema import BaseMessage, HumanMessage
 
-from realtime_ai_character.llm.base import AsyncCallbackAudioHandler, AsyncCallbackTextHandler, LLM
-from realtime_ai_character.logger import get_logger
-from realtime_ai_character.utils import Character, timed
+from characters.llm.base import AsyncCallbackAudioHandler, AsyncCallbackTextHandler, LLM
+from characters.logger import get_logger
+from characters.utils import Character, timed
 from langchain_community.embeddings import DashScopeEmbeddings
 from langchain_community.vectorstores import Chroma
 

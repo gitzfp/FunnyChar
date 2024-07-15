@@ -171,6 +171,7 @@ cython_debug/
 *.ipynb
 google_credentials.json
 firebase_credentials.json
+character-speak.json
 
 ./node_modules
 

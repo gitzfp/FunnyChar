@@ -7,14 +7,14 @@ from alembic import context
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
-from realtime_ai_character.database.base import Base  # import the Base model
+from characters.database.base import Base  # import the Base model
 # dummy import to support alembic revision --autogenerate
-from realtime_ai_character.models.character import Character
-from realtime_ai_character.models.feedback import Feedback
-from realtime_ai_character.models.interaction import Interaction
-from realtime_ai_character.models.memory import Memory
-from realtime_ai_character.models.quivr_info import QuivrInfo
-from realtime_ai_character.models.user import User  
+from characters.models.character import Character
+from characters.models.feedback import Feedback
+from characters.models.interaction import Interaction
+from characters.models.memory import Memory
+from characters.models.quivr_info import QuivrInfo
+from characters.models.user import User  
 
 
 load_dotenv()

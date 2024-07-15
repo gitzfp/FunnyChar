@@ -18,20 +18,20 @@ RUN echo "deb http://deb.debian.org/debian/ bullseye main\ndeb-src http://deb.de
     apt-get install -y ffmpeg
 
 
-WORKDIR /realtime_ai_character
+WORKDIR /characters
 
 # Install Python dependencies
-COPY requirements.txt /realtime_ai_character
-RUN pip install -r /realtime_ai_character/requirements.txt
+COPY requirements.txt /characters
+RUN pip install -r /characters/requirements.txt
 
 # Copy the project files
-COPY ./ /realtime_ai_character
+COPY ./ /characters
 
 # Expose 8000 port from the docker image.
 EXPOSE 8000
 
 # Make the entrypoint script executable
-RUN chmod +x /realtime_ai_character/entrypoint.sh
+RUN chmod +x /characters/entrypoint.sh
 
 # Run the application
-CMD ["/bin/sh", "/realtime_ai_character/entrypoint.sh"]
+CMD ["/bin/sh", "/characters/entrypoint.sh"]

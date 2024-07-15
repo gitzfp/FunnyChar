@@ -1,11 +1,13 @@
-Client
----
+## Client
 
 # Mobile
+
 Read ios/README.md
 
 # Web
-Under realtime_ai_character/static
+
+Under characters/static
 
 # Terminal
+
 Under client/cli.py
