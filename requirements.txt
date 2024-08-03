@@ -57,3 +57,4 @@ datasets>=2.18.0
 tokenizers>=0.14,<0.19
 faster_whisper
 modelscope[framework]>=1.16.0
+deepgram-sdk

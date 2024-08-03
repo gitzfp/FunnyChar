@@ -5,6 +5,11 @@ from characters.audio.speech_to_text.base import SpeechToText
 
 def get_speech_to_text() -> SpeechToText:
     use = os.getenv("SPEECH_TO_TEXT_USE", "LOCAL_WHISPER")
+    if use == "DEEPGRAM":
+        from characters.audio.speech_to_text.deepgram import DeepgramTranscriber
+
+        DeepgramTranscriber.initialize()
+        return DeepgramTranscriber.get_instance()
     if use == "GOOGLE":
         from characters.audio.speech_to_text.google import Google
 
