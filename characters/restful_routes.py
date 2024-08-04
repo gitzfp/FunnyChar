@@ -39,6 +39,8 @@ from characters.models.character import (
     GenerateHighlightRequest,
     GeneratePromptRequest,
 )
+from fastapi.responses import JSONResponse
+import aiofiles
 
 
 router = APIRouter()
@@ -107,7 +109,7 @@ async def status():
 
 
 @router.get("/characters")
-async def characters(user=Depends(get_current_user)):
+async def characters():
     gcs_path = os.getenv("GCP_STORAGE_URL")
     if not gcs_path:
         raise HTTPException(
@@ -121,7 +123,7 @@ async def characters(user=Depends(get_current_user)):
         else:
             return f"{gcs_path}/static/realchar/{character.character_id}.jpg"
 
-    uid = user["uid"] if user else None
+    # uid = user["uid"] if user else None
     from characters.character_catalog.catalog_manager import CatalogManager
 
     catalog: CatalogManager = CatalogManager.get_instance()
@@ -135,13 +137,11 @@ async def characters(user=Depends(get_current_user)):
             "audio_url": f"{gcs_path}/static/realchar/{character.character_id}.mp3",
             "image_url": get_image_url(character),
             "tts": character.tts,
-            "is_author": character.author_id == uid,
+            "is_author": False,
             "location": character.location,
-            "rebyte_project_id": character.rebyte_api_project_id,
-            "rebyte_agent_id": character.rebyte_api_agent_id,
         }
         for character in sorted(catalog.characters.values(), key=lambda c: c.order)
-        if character.author_id == uid or character.visibility == "public"
+        if character.visibility == "public"
     ]
 
 
@@ -183,37 +183,42 @@ async def post_feedback(
 async def upload_file(file: UploadFile = File(...), user=Depends(get_current_user)):
     if not user:
         raise HTTPException(
-            status_code=http_status.HTTP_401_UNAUTHORIZED,
+            status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid authentication credentials",
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    storage_client = storage.Client()
-    bucket_name = os.environ.get("GCP_STORAGE_BUCKET_NAME")
-    if not bucket_name:
-        raise HTTPException(
-            status_code=http_status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="GCP_STORAGE_BUCKET_NAME is not set",
-        )
+    # 获取存储目录并展开用户主目录符号 (~)
+    storage_directory = os.getenv("LOCAL_STORAGE_DIRECTORY", "./uploads")
+    storage_directory = os.path.expanduser(storage_directory)
 
-    bucket = storage_client.bucket(bucket_name)
+    # 确保存储目录存在
+    if not os.path.exists(storage_directory):
+        os.makedirs(storage_directory)
 
-    # Create a new filename with a timestamp and a random uuid to avoid duplicate filenames
+    # 创建新的文件名，带有时间戳和随机 uuid 以避免重复文件名
     file_extension = os.path.splitext(
         file.filename)[1] if file.filename else ""
     new_filename = (
-        f"user_upload/{user['uid']}/"
         f"{datetime.datetime.now().strftime('%Y%m%d-%H%M%S')}-"
         f"{uuid.uuid4()}{file_extension}"
     )
 
-    blob = bucket.blob(new_filename)
+    # 确保用户目录存在
+    user_directory = os.path.join(
+        storage_directory, f"user_upload/{user['uid']}")
+    if not os.path.exists(user_directory):
+        os.makedirs(user_directory)
 
-    contents = await file.read()
+    # 生成完整的文件路径
+    file_path = os.path.join(user_directory, new_filename)
 
-    await asyncio.to_thread(blob.upload_from_string, contents)
+    # 异步写入文件
+    async with aiofiles.open(file_path, 'wb') as out_file:
+        contents = await file.read()
+        await out_file.write(contents)
 
-    return {"filename": new_filename, "content-type": file.content_type}
+    return JSONResponse(content={"filename": new_filename, "content-type": file.content_type})
 
 
 @router.post("/create_character")

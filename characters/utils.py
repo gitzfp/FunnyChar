@@ -30,9 +30,6 @@ class Character:
     tts: Optional[str] = ""
     order: int = 10**9  # display order on the website
     data: Optional[dict] = None
-    rebyte_api_project_id: Optional[str] = None
-    rebyte_api_agent_id: Optional[str] = None
-    rebyte_api_version: Optional[int] = None
 
 
 @dataclass
@@ -48,9 +45,11 @@ class ConversationHistory:
             yield ai_message
 
     def load_from_db(self, session_id: str, db: Session):
-        conversations = db.query(Interaction).filter(Interaction.session_id == session_id).all()
+        conversations = db.query(Interaction).filter(
+            Interaction.session_id == session_id).all()
         for conversation in conversations:
-            self.user.append(conversation.client_message_unicode)  # type: ignore
+            # type: ignore
+            self.user.append(conversation.client_message_unicode)
             self.ai.append(conversation.server_message_unicode)  # type: ignore
 
 

@@ -14,9 +14,9 @@ def get_llm(model="gpt-3.5-turbo-16k") -> LLM:
     model = os.getenv("LLM_MODEL_USE", model)
 
     if model.startswith("qwen"):
-        from characters.llm.qwen_llm import QwenLlm
+        from characters.llm.qwen_llm import TongyiLlm
 
-        return QwenLlm(model=model)
+        return TongyiLlm(model=model)
 
     if model.startswith("gpt"):
         from characters.llm.openai_llm import OpenaiLlm
@@ -52,9 +52,9 @@ def get_chat_model(model="gpt-3.5-turbo-16k") -> BaseChatModel:
     model = os.getenv("LLM_MODEL_USE", model)
     if model.startswith("qwen"):
         # TODO
-        from characters.llm.rebyte_llm import RebyteLlm
+        from characters.llm.qwen_llm import TongyiLlm
 
-        return RebyteLlm().chat_rebyte
+        return TongyiLlm(model=model).chat_tongyi
     if model.startswith("gpt"):
         from characters.llm.openai_llm import OpenaiLlm
 
@@ -99,5 +99,7 @@ def get_chat_model_from_env() -> BaseChatModel:
         return get_chat_model(model="meta-llama/Llama-2-70b-chat-hf")
     elif os.getenv("LOCAL_LLM_URL"):
         return get_chat_model(model="localhost")
+    elif os.getenv("DASHSCOPE_API_KEY"):
+        return get_chat_model(model="qwen-max")
 
     raise ValueError("No llm api key found in env")

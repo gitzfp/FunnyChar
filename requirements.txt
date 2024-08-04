@@ -9,7 +9,6 @@ fastapi[all]==0.103.2
 firebase_admin==6.2.0
 google-cloud-speech==2.23.0
 httpx==0.25.0
-langchain==0.0.308
 llama_index==0.8.39.post2
 numpy==1.26.0
 openai
@@ -36,7 +35,6 @@ jieba
 json5
 jupyter>=1.0.0
 langchain-community==0.0.20
-langchain-core
 langchain-experimental
 llama-index-readers-json
 llama-index-retrievers-bm25
@@ -58,3 +56,8 @@ tokenizers>=0.14,<0.19
 faster_whisper
 modelscope[framework]>=1.16.0
 deepgram-sdk
+mysqlclient
+aiofiles
+langchain
+langchain-core
+langsmith

@@ -122,7 +122,7 @@ export default function JournalPage() {
         <div className="h-3/6 relative flex flex-col lg:h-full lg:w-1/2 lg:border-x-1 border-real-blue-500/50 lg:border-b-1">
           <ActionChatPanel />
           <div className="px-1 py-1 border-white/30 border-t-1 border-x-1 rounded-t-lg  journal_mode md:border-b-1 md:rounded-b-lg md:mx-2 md:mb-2">
-            {/* <InputEmoji
+            <InputEmoji
               value={text}
               onChange={setText}
               cleanOnEnter
@@ -130,7 +130,7 @@ export default function JournalPage() {
               placeholder=""
               fontSize={16}
               fontFamily=""
-            /> */}
+            />
             <Input
               value={text}
               onValueChange={setText}

@@ -18,7 +18,7 @@ config = types.SimpleNamespace(
     **{
         "model": os.getenv("LOCAL_WHISPER_MODEL", "base"),
         "language": "en",
-        "api_key": os.getenv("OPENAI_API_KEY"),
+        "api_key": os.getenv("OPENAI_WHISPER_API_KEY"),
     }
 )
 
@@ -48,7 +48,8 @@ class Whisper(Singleton, SpeechToText):
                 device = "cuda"
             except Exception:
                 device = "cpu"
-            logger.info(f"Loading [Local Whisper] model: [{config.model}]({device}) ...")
+            logger.info(
+                f"Loading [Local Whisper] model: [{config.model}]({device}) ...")
             self.model = WhisperModel(
                 model_size_or_path=config.model,
                 device="auto",
@@ -65,7 +66,8 @@ class Whisper(Singleton, SpeechToText):
         elif platform == "twilio":
             audio = self._ulaw_to_wav(audio_bytes, self.use == "local")
         else:
-            audio = self._convert_bytes_to_wav(audio_bytes, self.use == "local")
+            audio = self._convert_bytes_to_wav(
+                audio_bytes, self.use == "local")
         if self.use == "local":
             return self._transcribe(audio, prompt, suppress_tokens=suppress_tokens)
         elif self.use == "api":
@@ -102,12 +104,14 @@ class Whisper(Singleton, SpeechToText):
 
     def _convert_bytes_to_wav(self, audio_bytes, local=True):
         if local:
-            audio = io.BytesIO(sr.AudioData(audio_bytes, 44100, 2).get_wav_data())
+            audio = io.BytesIO(sr.AudioData(
+                audio_bytes, 44100, 2).get_wav_data())
             return audio
         return sr.AudioData(audio_bytes, 44100, 2)
 
     def _ulaw_to_wav(self, audio_bytes, local=True):
-        sound = AudioSegment(data=audio_bytes, sample_width=1, frame_rate=8000, channels=1)
+        sound = AudioSegment(data=audio_bytes, sample_width=1,
+                             frame_rate=8000, channels=1)
 
         audio = io.BytesIO()
         sound.export(audio, format="wav")

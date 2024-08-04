@@ -30,7 +30,7 @@ class RunInfo:
         self.run_id = run_id
 
 
-class QwenLlm(LLM):
+class TongyiLlm(LLM):
     def __init__(self, model):
         self.config = {'model': 'qwen-max', 'model_server': 'dashscope'}
         self.db = get_chroma()
@@ -70,13 +70,15 @@ class QwenLlm(LLM):
             logger.debug(f"History after adding user input: {history}")
 
             bot = RolePlay(
-                function_list=[], llm=self.config, instruction=context)
+                function_list=[], llm=self.config, instruction=character.llm_system_prompt)
             response = bot.run(user_input)  # 确保这里是同步调用
 
             text = ''
             for chunk in response:
                 text += chunk
                 await callback.on_new_token(chunk)  # 调用callback
+                logger.info(
+                    f"qwen response===========: {chunk}")
                 if audioCallback is not None:
                     await audioCallback.on_llm_new_token(chunk)  # 调用音频回调
 
@@ -84,22 +86,11 @@ class QwenLlm(LLM):
             run_id = uuid4()
             text += f"[end={run_id}]"
 
-            ai_message = AIMessage(content=text, response_metadata={
-                                   'finish_reason': 'stop'})
-            chat_generation = ChatGeneration(text=text, generation_info={
-                                             'finish_reason': 'stop'}, message=ai_message)
-            run_info = RunInfo(run_id)
-
-            # Ensure on_llm_end is called with the complete response
-
             await callback.on_llm_end(text)
             if audioCallback is not None:
                 await audioCallback.on_llm_end(text)  # 调用音频回调
 
-            logger.info(
-                f"qwen response: {text}=========metadata: {metadata} run_info: {run_info} text: {chat_generation.text}")
-
-            return chat_generation.text
+            return text
 
         except Exception as e:
             logger.error(f"An error occurred in achat: {e}")
@@ -142,8 +133,8 @@ class QwenLlm(LLM):
         context = "\n".join([d.page_content for d in docs])
         logger.debug(f"Generated context: {context}")
 
-        # 添加系统提示
-        full_context = f"{character.llm_system_prompt}\n{context}"
-        logger.debug(f"Generated full context: {full_context}")
+        # # 添加系统提示
+        # full_context = f"{character.llm_system_prompt}\n{context}"
+        # logger.debug(f"Generated full context: {full_context}")
 
-        return full_context
+        return context

@@ -43,9 +43,9 @@ export default function Tabs({ characters }) {
         <TabButton isSelected={tabNow === 'community'} handlePress={() => setTabNow('community')}>
           发现
         </TabButton>
-        <Link href='/create'>
+        {/* <Link href='/create'>
           <TabButton isSelected={tabNow === 'create'}>创建</TabButton>
-        </Link>
+        </Link> */}
         <TabButton
           isSelected={user && tabNow === 'myCharacters'}
           isDisabled={user == null}

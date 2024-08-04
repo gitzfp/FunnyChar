@@ -14,7 +14,7 @@ logger = get_logger(__name__)
 
 def get_qwen_chroma():
     embeddings = DashScopeEmbeddings(
-        model="text-embedding-v1", dashscope_api_key=os.getenv("QWEN_API_KEY"))
+        model="text-embedding-v1", dashscope_api_key=os.getenv("DASHSCOPE_API_KEY"))
 
     chroma = Chroma(
         collection_name="qwen",
@@ -26,7 +26,7 @@ def get_qwen_chroma():
 
 def get_chroma(embedding: bool = True):
     if embedding:
-        if os.getenv("QWEN_API_KEY"):
+        if os.getenv("DASHSCOPE_API_KEY"):
             return get_qwen_chroma()
         openai_api_key = os.getenv("OPENAI_API_KEY")
         if not openai_api_key:
@@ -34,6 +34,7 @@ def get_chroma(embedding: bool = True):
                 "OPENAI_API_KEY is required to generate embeddings")
         if os.getenv("OPENAI_API_TYPE") == "azure":
             embedding_function = OpenAIEmbeddings(
+                openai_api_base=os.getenv('OPENAI_BASE_URL'),
                 openai_api_key=openai_api_key,
                 deployment=os.getenv(
                     "OPENAI_API_EMBEDDING_DEPLOYMENT_NAME", "text-embedding-ada-002"
@@ -41,7 +42,10 @@ def get_chroma(embedding: bool = True):
                 chunk_size=1,
             )
         else:
+            print("os.getenv('OPENAI_BASE_URL')环境变量",
+                  os.getenv('OPENAI_BASE_URL'),)
             embedding_function = OpenAIEmbeddings(
+                openai_api_base=os.getenv('OPENAI_BASE_URL'),
                 openai_api_key=openai_api_key)
     else:
         embedding_function = None
