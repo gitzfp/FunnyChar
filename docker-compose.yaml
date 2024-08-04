@@ -9,7 +9,7 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      PGDATA: /var/lib/postgresql/data/realchar
+      PGDATA: /var/lib/postgresql/data/funnychar
     ports:
       - '5432:5432'
     volumes:

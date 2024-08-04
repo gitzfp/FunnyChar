@@ -62,7 +62,7 @@ character_list = [
     "elon_musk",
     "loki",
     "raiden_shogun_and_ei",
-    "realchar",
+    "funnychar",
     "rebyte",
     "sam_altman",
     "santa_claus",
@@ -87,12 +87,14 @@ GREETING_TXT_MAP = {
 
 MEDIA_SAMPLE_RATE = 8000  # 8000hz sample rate
 FRAME_INTERVAL_MS = 20  # 20 ms
-LEN_PER_FRAME = MEDIA_SAMPLE_RATE * FRAME_INTERVAL_MS / 1000  # each sample is 8 bit
+LEN_PER_FRAME = MEDIA_SAMPLE_RATE * \
+    FRAME_INTERVAL_MS / 1000  # each sample is 8 bit
 
 
 @twilio_router.post("/call")
 async def call_websocket(request: Request, req: MakeTwilioOutgoingCallRequest):
-    client = Client(os.getenv("TWILIO_ACCOUNT_SID", ""), os.getenv("TWILIO_ACCESS_TOKEN", ""))
+    client = Client(os.getenv("TWILIO_ACCOUNT_SID", ""),
+                    os.getenv("TWILIO_ACCESS_TOKEN", ""))
 
     to = req.target_number
     from_ = req.source_number
@@ -132,7 +134,7 @@ async def get_websocket(request: Request):
     vad_threshold = request.query_params.get("vad_threshold")
     connect = Connect()
     stream = connect.stream(
-        name=character_id if character_id else "RealChar Endpoint",
+        name=character_id if character_id else "FunnyChar Endpoint",
         url=f"wss://{request.url.hostname}/twilio/ws",
     )
     stream.parameter(name="character_id", value=character_id)  # type: ignore
@@ -197,7 +199,8 @@ class TwilioConversationEngine:
             decoded = audioop.ulaw2lin(vad_data, 2)
             vad_16 = np.frombuffer(decoded, dtype=np.int16)
             vad_32 = self._int2float(vad_16)
-            speech_prob = self._vad_model(torch.from_numpy(vad_32), MEDIA_SAMPLE_RATE).item()
+            speech_prob = self._vad_model(
+                torch.from_numpy(vad_32), MEDIA_SAMPLE_RATE).item()
 
         if self._state == self.VAD_STATE.INITIAL:
             # transition to TALKING
@@ -217,7 +220,8 @@ class TwilioConversationEngine:
                 self._state = self.VAD_STATE.SILENCE
                 # record the transition time from TALKING to SILENCE so that
                 # we can calculate silence time
-                self._most_recent_silence_frame = len(self._audio_buffer) / LEN_PER_FRAME
+                self._most_recent_silence_frame = len(
+                    self._audio_buffer) / LEN_PER_FRAME
 
                 coro = asyncio.to_thread(
                     self._speech_to_text.transcribe, self._audio_buffer, platform="twilio"
@@ -240,7 +244,8 @@ class TwilioConversationEngine:
                 return
 
             diff = FRAME_INTERVAL_MS * (
-                len(self._audio_buffer) / LEN_PER_FRAME - self._most_recent_silence_frame
+                len(self._audio_buffer) / LEN_PER_FRAME -
+                self._most_recent_silence_frame
             )
 
             if (
@@ -333,7 +338,8 @@ async def handle_receive(
             user_input=transcript,
             user_id=user_id,
             character=character,
-            callback=AsyncCallbackTextHandler(on_new_token, token_buffer, tts_task_done_call_back),
+            callback=AsyncCallbackTextHandler(
+                on_new_token, token_buffer, tts_task_done_call_back),
             audioCallback=AsyncCallbackAudioHandler(
                 text_to_speech,
                 websocket,
@@ -378,7 +384,8 @@ async def handle_receive(
                     if character_id != "":
                         character = catalog_manager.get_character(character_id)
                         if not character:
-                            raise WebSocketDisconnect(reason="character not found")
+                            raise WebSocketDisconnect(
+                                reason="character not found")
                         conversation_history.system_prompt = character.llm_system_prompt
                 vad_threshold = obj["start"]["customParameters"]["vad_threshold"]
                 buffer.setTalkingThreshold(float(vad_threshold))

@@ -5,14 +5,14 @@ export default function Privacy() {
     <>
       <Header />
       <div className="py-5 px-4 flex flex-col gap-3 md:w-unit-9xl md:mx-auto md:gap-5 lg:w-[892px] lg:gap-8">
-        <h1 className="text-2xl font-medium">Privacy Notice for RealChar</h1>
+        <h1 className="text-2xl font-medium">Privacy Notice for FunnyChar</h1>
         <p>
           <strong>Effective Date:</strong> 08/18/2023
         </p>
 
         <h2 className="text-xl font-medium">Introduction</h2>
         <p>
-          Thank you for using RealChar. We respect your privacy and want to
+          Thank you for using FunnyChar. We respect your privacy and want to
           protect your personal data. This privacy notice will inform you as to
           how we look after your personal data when you visit our website
           (regardless of where you visit it from) and tell you about your privacy
@@ -77,7 +77,7 @@ export default function Privacy() {
         <h2 className="text-xl font-medium">Contact Us</h2>
         <p>
           For any questions about this privacy notice or our privacy practices,
-          please contact us at privacy@realchar.ai.
+          please contact us at privacy@funnychar.ai.
         </p>
       </div>
       <Footer />

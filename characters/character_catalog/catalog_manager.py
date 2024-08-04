@@ -47,7 +47,7 @@ class CatalogManager(Singleton):
         super().__init__()
         overwrite = os.getenv("OVERWRITE_CHROMA") != "false"
         # skip Chroma if Openai API key is not set
-        if os.getenv("OPENAI_API_KEY") or os.getenv("QWEN_API_KEY"):
+        if os.getenv("OPENAI_API_KEY") or os.getenv("DASHSCOPE_API_KEY"):
             self.db = get_chroma()
         else:
             self.db = get_chroma(embedding=False)

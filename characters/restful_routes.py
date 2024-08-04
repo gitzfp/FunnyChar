@@ -105,7 +105,7 @@ async def get_current_user(request: Request):
 
 @router.get("/status")
 async def status():
-    return {"status": "ok", "message": "RealChar is running smoothly!"}
+    return {"status": "ok", "message": "FunnyChar is running smoothly!"}
 
 
 @router.get("/characters")
@@ -121,7 +121,7 @@ async def characters():
         if character.data and "avatar_filename" in character.data:
             return f'{gcs_path}/{character.data["avatar_filename"]}'
         else:
-            return f"{gcs_path}/static/realchar/{character.character_id}.jpg"
+            return f"{gcs_path}/static/funnychar/{character.character_id}.jpg"
 
     # uid = user["uid"] if user else None
     from characters.character_catalog.catalog_manager import CatalogManager
@@ -134,7 +134,7 @@ async def characters():
             "source": character.source,
             "voice_id": character.voice_id,
             "author_name": character.author_name,
-            "audio_url": f"{gcs_path}/static/realchar/{character.character_id}.mp3",
+            "audio_url": f"{gcs_path}/static/funnychar/{character.character_id}.mp3",
             "image_url": get_image_url(character),
             "tts": character.tts,
             "is_author": False,

@@ -1,8 +1,8 @@
-# <img src="https://storage.googleapis.com/assistly/static/realchar/realchar.svg" height="24px" style="padding-top:4px"/>RealChar. - Your Realtime AI Character
+# <img src="https://storage.googleapis.com/assistly/static/funnychar/funnychar.svg" height="24px" style="padding-top:4px"/>FunnyChar. - Your Realtime AI Character
 
 <br/>
 <div align="center">
-    <img src="https://storage.googleapis.com/assistly/static/realchar/logo.png" alt="RealChar-logo" width="80%"  style="padding: 40px"/>
+    <img src="https://storage.googleapis.com/assistly/static/funnychar/logo.png" alt="FunnyChar-logo" width="80%"  style="padding: 40px"/>
 </div>
 <br/>
 <p align="center">
@@ -10,18 +10,18 @@
 </p>
 
 <div align="center">
-    <a href="https://realchar.ai/join-discord">
+    <a href="https://funnychar.ai/join-discord">
     <img src="https://img.shields.io/badge/discord-join%20chat-blue.svg?style=for-the-badge" alt="Join our Discord" height="20">
     </a>
     <a href="https://twitter.com/agishaun">
     <img alt="Twitter Follow" src="https://img.shields.io/twitter/follow/agishaun?style=for-the-badge" height="20">
-    <a href="https://github.com/Shaunwei/RealChar">
-    <img alt="GitHub" src="https://img.shields.io/github/stars/Shaunwei/RealChar?style=for-the-badge&color=gold" height="20">
+    <a href="https://github.com/Shaunwei/FunnyChar">
+    <img alt="GitHub" src="https://img.shields.io/github/stars/Shaunwei/FunnyChar?style=for-the-badge&color=gold" height="20">
     </a>
-    <a href="https://github.com/Shaunwei/RealChar/commits/main">
-    <img alt="GitHub" src="https://img.shields.io/github/last-commit/Shaunwei/RealChar/main?style=for-the-badge" height="20">
+    <a href="https://github.com/Shaunwei/FunnyChar/commits/main">
+    <img alt="GitHub" src="https://img.shields.io/github/last-commit/Shaunwei/FunnyChar/main?style=for-the-badge" height="20">
     </a>
-    <a href="https://github.com/Shaunwei/RealChar/blob/main/README.md" target="_blank">
+    <a href="https://github.com/Shaunwei/FunnyChar/blob/main/README.md" target="_blank">
     <img src="https://img.shields.io/static/v1?label=license&message=MIT&color=green&style=for-the-badge" alt="License" height="20">
     </a>
     <a href="https://hub.docker.com/repository/docker/shaunly/real_char/general" target="_blank">
@@ -31,21 +31,21 @@
 
 ## ✨ Demo
 
-Try our site at [RealChar.ai](https://realchar.ai/)
+Try our site at [FunnyChar.ai](https://funnychar.ai/)
 
-Not sure how to pronounce RealChar? Listen to this 👉 [audip](https://github.com/Shaunwei/RealChar/assets/6148473/45d4773c-eb4f-41e5-a162-f9513d650b76)
+Not sure how to pronounce FunnyChar? Listen to this 👉 [audip](https://github.com/Shaunwei/FunnyChar/assets/6148473/45d4773c-eb4f-41e5-a162-f9513d650b76)
 
 ### Demo 1 - with Santa Claus!
 
-https://github.com/Shaunwei/RealChar/assets/5101573/6b35a80e-5503-4850-973d-254039bd383c
+https://github.com/Shaunwei/FunnyChar/assets/5101573/6b35a80e-5503-4850-973d-254039bd383c
 
 ### Demo 2 - with AI Elon about cage fight!
 
-https://github.com/Shaunwei/RealChar/assets/5101573/5de0b023-6cf3-4947-84cb-596f429d109e
+https://github.com/Shaunwei/FunnyChar/assets/5101573/5de0b023-6cf3-4947-84cb-596f429d109e
 
 ### Demo 3 - with AI Raiden about AI and "real" memory
 
-https://github.com/Shaunwei/RealChar/assets/5101573/62a1f3d1-1166-4254-9119-97647be52c42
+https://github.com/Shaunwei/FunnyChar/assets/5101573/62a1f3d1-1166-4254-9119-97647be52c42
 
 **Demo settings: Web, GPT4, ElevenLabs with voice clone, Chroma, Google Speech to Text**
 
@@ -61,7 +61,7 @@ https://github.com/Shaunwei/RealChar/assets/5101573/62a1f3d1-1166-4254-9119-9764
 ## 🔬 Tech stack
 
 <div align="center">
-    <img src="https://storage.googleapis.com/assistly/static/realchar/techstackv004.jpg" alt="RealChar-tech-stack" width="100%"  style="padding: 20px"/>
+    <img src="https://storage.googleapis.com/assistly/static/funnychar/techstackv004.jpg" alt="FunnyChar-tech-stack" width="100%"  style="padding: 20px"/>
 </div>
 
 - ✅**Web**: [React JS](https://react.dev/), [Vanilla JS](http://vanilla-js.com/), [WebSockets](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API)
@@ -77,7 +77,7 @@ https://github.com/Shaunwei/RealChar/assets/5101573/62a1f3d1-1166-4254-9119-9764
 ## 📚 Comparison with existing products
 
 <div align="center">
-    <img src="https://storage.googleapis.com/assistly/static/realchar/compare.png">
+    <img src="https://storage.googleapis.com/assistly/static/funnychar/compare.png">
 </div>
 
 ## 📀 Quick Start - Installation via Docker
@@ -106,7 +106,7 @@ https://github.com/Shaunwei/RealChar/assets/5101573/62a1f3d1-1166-4254-9119-9764
 
 - **Step 1**. Clone the repo
   ```sh
-  git clone https://github.com/Shaunwei/RealChar.git && cd RealChar
+  git clone https://github.com/Shaunwei/FunnyChar.git && cd FunnyChar
   ```
 - **Step 2**. Install requirements
 
@@ -205,7 +205,7 @@ https://github.com/Shaunwei/RealChar/assets/5101573/62a1f3d1-1166-4254-9119-9764
 
 - **Step 8**. Select one character to talk to, then start talking. Use **GPT4** for better conversation and **Wear headphone** for best audio(avoid echo)
 
-Note if you want to remotely connect to a RealChar server, SSL set up is required to establish the audio connection.
+Note if you want to remotely connect to a FunnyChar server, SSL set up is required to establish the audio connection.
 
 ## 👨‍🚀 API Keys and Configurations
 
@@ -345,7 +345,7 @@ see [docs/rebyte_agent_clone_instructions.md](docs/rebyte_agent_clone_instructio
 
 <details><summary>👇click me</summary>
 
-To use [Twilio](https://www.twilio.com/en-us) with RealChar, you need to set up a Twilio account. Then, fill in the following environment variables in your `.env` file:
+To use [Twilio](https://www.twilio.com/en-us) with FunnyChar, you need to set up a Twilio account. Then, fill in the following environment variables in your `.env` file:
 
 ```sh
 TWILIO_ACCOUNT_SID=YOUR_TWILIO_ACCOUNT_SID
@@ -367,7 +367,7 @@ Note: only US phone numbers and Elevenlabs voiced characters are supported at th
 
 ### Anyscale
 
-You can now use [Anyscale Endpoint](https://app.endpoints.anyscale.com/landing) to serve Llama-2 models in your RealChar easily! Simply register an account with Anyscale Endpoint. Once you get the API key, set this environment variable in your `.env` file:
+You can now use [Anyscale Endpoint](https://app.endpoints.anyscale.com/landing) to serve Llama-2 models in your FunnyChar easily! Simply register an account with Anyscale Endpoint. Once you get the API key, set this environment variable in your `.env` file:
 
 ```
 ANYSCALE_ENDPOINT_API_KEY=<your API Key>
@@ -407,16 +407,16 @@ And it should work out of the box.
 
 $*$ These features are powered by [ReByte](https://rebyte.ai/) platform.
 
-## 🫶 Contribute to RealChar
+## 🫶 Contribute to FunnyChar
 
 Please check out our [Contribution Guide](contribute.md)!
 
 ## 💪 Contributors
 
-<a href="https://github.com/Shaunwei/RealChar">
-  <img src="https://contrib.rocks/image?repo=Shaunwei/RealChar" />
+<a href="https://github.com/Shaunwei/FunnyChar">
+  <img src="https://contrib.rocks/image?repo=Shaunwei/FunnyChar" />
 </a>
 
 ## 🎲 Community
 
-- Join us on [Discord](https://realchar.ai/join-discord)
+- Join us on [Discord](https://funnychar.ai/join-discord)

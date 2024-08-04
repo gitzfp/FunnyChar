@@ -1,6 +1,6 @@
 import { Avatar } from '@nextui-org/avatar';
 import Image from 'next/image';
-import realCharSVG from '@/assets/svgs/realchar.svg';
+import realCharSVG from '@/assets/svgs/funnychar.svg';
 import { useAppStore } from '@/zustand/store';
 
 export default function ChatPreview() {

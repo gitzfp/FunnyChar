@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""A CLI for building an running RealChar project locally."""
+"""A CLI for building an running FunnyChar project locally."""
 import click
 import os
 import subprocess
@@ -116,7 +116,7 @@ def next_web_dev():
 
 @click.command()
 @click.option("--file", "-f", default="client/next-web/.env", help="Path to the .env file.")
-@click.option("--image-name", "-i", default="realchar-next-web", help="Name of the Docker image.")
+@click.option("--image-name", "-i", default="funnychar-next-web", help="Name of the Docker image.")
 @click.option(
     "--rebuild", is_flag=True, help="Flag to indicate whether to rebuild the Docker image."
 )
@@ -158,7 +158,7 @@ def docker_next_web_build(file, image_name, rebuild):
 @click.command()
 @click.option("--file", "-f", default="client/next-web/.env", help="Path to the .env file.")
 @click.option(
-    "--image-name", "-i", default="realchar-next-web", help="The name of the Docker image to run."
+    "--image-name", "-i", default="funnychar-next-web", help="The name of the Docker image to run."
 )
 def docker_next_web_run(file, image_name):
     """Run docker image using client/next-web/.env file for environment variables."""

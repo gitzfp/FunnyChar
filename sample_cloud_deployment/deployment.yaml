@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: realchar-deployment
+  name: funnychar-deployment
   labels:
-    app: realchar
+    app: funnychar
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: realchar
+      app: funnychar
   template:
     metadata:
       labels:
-        app: realchar
+        app: funnychar
     spec:
       containers:
-      - name: realchar-container
+      - name: funnychar-container
         image: <YOUR_IMAGE_TAG>
         ports:
         - containerPort: 8000
@@ -46,12 +46,12 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: realchar-service
+  name: funnychar-service
   annotations:
 spec:
   type: LoadBalancer
   selector:
-    app: realchar
+    app: funnychar
   ports:
     - protocol: TCP
       port: 80

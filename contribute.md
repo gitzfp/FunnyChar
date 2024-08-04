@@ -1,14 +1,14 @@
 # Contribution Guide
-Welcome to the RealChar project contribution guide. If you're looking to help, this is a great place to start. Follow these guidelines to help ensure the process is as smooth as possible for both you and the project maintainers.
+Welcome to the FunnyChar project contribution guide. If you're looking to help, this is a great place to start. Follow these guidelines to help ensure the process is as smooth as possible for both you and the project maintainers.
 
 # Setup
-1. Fork the RealChar repository
+1. Fork the FunnyChar repository
 2. Clone the fork to your local machine
-3. Set the upstream remote to the original RealChar repository
+3. Set the upstream remote to the original FunnyChar repository
 ```bash
-git clone https://github.com/<your username>/RealChar.git
-cd RealChar
-git remote add upstream https://github.com/Shaunwei/RealChar.git
+git clone https://github.com/<your username>/FunnyChar.git
+cd FunnyChar
+git remote add upstream https://github.com/Shaunwei/FunnyChar.git
 ```
 4. Install `pre-commit` and set up the `pre-commit` hooks for the repo:
 ```bash
@@ -44,7 +44,7 @@ Please adhere to the following:
 3. Push your changes to your fork: git push origin <branch-name>
 
 # Submitting a Pull Request
-1. Navigate to the original RealChar repository
+1. Navigate to the original FunnyChar repository
 2. Click 'New pull request'
 3. Choose your fork and the branch containing your changes
 4. Give your pull request a title and detailed description
@@ -57,6 +57,6 @@ If you're adding a new feature or fixing a bug, make sure to add or update an is
 By participating in this project, you're expected to uphold our Code of Conduct.
 
 # Where to Get Help
-If you run into problems or need help, check out our [discord](https://realchar.ai/join-discord).
+If you run into problems or need help, check out our [discord](https://funnychar.ai/join-discord).
 
-Thank you for considering contributing to RealChar! Your time and expertise is greatly appreciated by the community.
+Thank you for considering contributing to FunnyChar! Your time and expertise is greatly appreciated by the community.
