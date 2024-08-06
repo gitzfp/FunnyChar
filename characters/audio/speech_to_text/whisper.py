@@ -1,6 +1,7 @@
 import io
 import os
 import subprocess
+import time
 import types
 
 import speech_recognition as sr
@@ -10,7 +11,11 @@ from pydub import AudioSegment
 from characters.audio.speech_to_text.base import SpeechToText
 from characters.logger import get_logger
 from characters.utils import Singleton, timed
-
+from openai import OpenAI
+client = OpenAI(
+    base_url=os.getenv('OPENAI_BASE_URL'),
+    api_key=os.getenv('OPENAI_API_KEY', 'api_key')
+)
 
 logger = get_logger(__name__)
 
@@ -86,13 +91,42 @@ class Whisper(Singleton, SpeechToText):
         return text
 
     def _transcribe_api(self, audio, prompt=""):
-        text = self.recognizer.recognize_whisper_api(
-            audio,
-            api_key=config.api_key,
-        )
-        return text
+        logger.info("Starting _transcribe_api")
+        try:
+            # 将 AudioData 转换为字节流
+            logger.info("Converting AudioData to byte stream")
+            audio_data = audio.get_wav_data()
+
+            # 将字节流转换为 BytesIO 对象并确保文件名和扩展名
+            audio_file = io.BytesIO(audio_data)
+            audio_file.name = 'audio.wav'  # Ensure the file has a proper name and extension
+
+            # 调用新的 OpenAI 音频转录 API
+            logger.info("Calling OpenAI Audio transcriptions API")
+            transcription = client.audio.transcriptions.create(
+                model="whisper-1",
+                file=audio_file
+            )
+            # 打印 transcription 对象类型和内容
+            logger.info("Transcription object type: %s", type(transcription))
+            logger.info("Transcription object content: %s", transcription)
+
+            # 假设 transcription 是一个对象，检查其属性
+            if hasattr(transcription, 'text'):
+                text = transcription.text
+                logger.info("Transcription completed successfully: %s", text)
+                return text
+            else:
+                logger.error(
+                    "Transcription object does not have 'text' attribute")
+                raise TypeError(
+                    "Transcription object does not have 'text' attribute")
+        except Exception as e:
+            logger.error(f"Error in _transcribe_api: {e}")
+            raise
 
     def _convert_webm_to_wav(self, webm_data, local=True):
+        logger.info("Converting webm to wav")
         webm_audio = AudioSegment.from_file(io.BytesIO(webm_data))
         wav_data = io.BytesIO()
         webm_audio.export(wav_data, format="wav")
@@ -103,6 +137,7 @@ class Whisper(Singleton, SpeechToText):
         return audio
 
     def _convert_bytes_to_wav(self, audio_bytes, local=True):
+        logger.info("Converting bytes to wav")
         if local:
             audio = io.BytesIO(sr.AudioData(
                 audio_bytes, 44100, 2).get_wav_data())
@@ -110,6 +145,7 @@ class Whisper(Singleton, SpeechToText):
         return sr.AudioData(audio_bytes, 44100, 2)
 
     def _ulaw_to_wav(self, audio_bytes, local=True):
+        logger.info("Converting ulaw to wav")
         sound = AudioSegment(data=audio_bytes, sample_width=1,
                              frame_rate=8000, channels=1)
 

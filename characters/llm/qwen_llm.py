@@ -8,7 +8,6 @@ from langchain.schema import BaseMessage, HumanMessage, AIMessage
 from characters.llm.base import AsyncCallbackAudioHandler, AsyncCallbackTextHandler, LLM
 from characters.logger import get_logger
 from characters.utils import Character, timed
-from langchain_community.embeddings import DashScopeEmbeddings
 from characters.database.chroma import get_chroma
 
 logger = get_logger(__name__)

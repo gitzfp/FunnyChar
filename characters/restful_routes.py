@@ -179,7 +179,7 @@ async def post_feedback(
     await asyncio.to_thread(feedback.save, db)
 
 
-@router.post("/uploadfile")
+@router.post("/uploadfile2")
 async def upload_file(file: UploadFile = File(...), user=Depends(get_current_user)):
     if not user:
         raise HTTPException(
@@ -219,6 +219,43 @@ async def upload_file(file: UploadFile = File(...), user=Depends(get_current_use
         await out_file.write(contents)
 
     return JSONResponse(content={"filename": new_filename, "content-type": file.content_type})
+
+
+@router.post("/uploadfile")
+async def upload_file(file: UploadFile = File(...), user=Depends(get_current_user)):
+    if not user:
+        raise HTTPException(
+            status_code=http_status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid authentication credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    storage_client = storage.Client()
+    bucket_name = os.environ.get("GCP_STORAGE_BUCKET_NAME")
+    if not bucket_name:
+        raise HTTPException(
+            status_code=http_status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="GCP_STORAGE_BUCKET_NAME is not set",
+        )
+
+    bucket = storage_client.bucket(bucket_name)
+
+    # Create a new filename with a timestamp and a random uuid to avoid duplicate filenames
+    file_extension = os.path.splitext(
+        file.filename)[1] if file.filename else ""
+    new_filename = (
+        f"user_upload/{user['uid']}/"
+        f"{datetime.datetime.now().strftime('%Y%m%d-%H%M%S')}-"
+        f"{uuid.uuid4()}{file_extension}"
+    )
+
+    blob = bucket.blob(new_filename)
+
+    contents = await file.read()
+
+    await asyncio.to_thread(blob.upload_from_string, contents)
+
+    return {"filename": new_filename, "content-type": file.content_type}
 
 
 @router.post("/create_character")
