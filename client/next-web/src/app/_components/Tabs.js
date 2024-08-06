@@ -3,16 +3,24 @@ import ExploreTab from './ExploreTab';
 import MyTab from './MyTab';
 import TabButton from '@/components/TabButton';
 
-import { useAuthContext } from '@/context/AuthContext';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
 import { useAppStore } from '@/zustand/store';
-import Link from 'next/link';
+import { useAuth } from "@clerk/nextjs";
 
 export default function Tabs({ characters }) {
-  const { user } = useAuthContext();
+  const { isLoaded, userId: user } = useAuth();
+  const router = useRouter();
   const { tabNow, setTabNow } = useAppStore();
   const searchParams = useSearchParams();
+
+  useEffect(() => {
+    if (isLoaded && !user) {
+      // 用户未登录时跳转到登录页面
+      router.push('/sign-in');
+    }
+  }, [isLoaded, user]);
+ 
 
   useEffect(() => {
     const tab = searchParams.get('tab');

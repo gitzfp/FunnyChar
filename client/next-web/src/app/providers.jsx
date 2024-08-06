@@ -3,13 +3,17 @@
 
 import { NextUIProvider } from '@nextui-org/react';
 import { AuthContextProvider } from '@/context/AuthContext';
+import { ClerkProvider } from '@clerk/nextjs';
+
 
 export function Providers({ children }) {
   return (
     <NextUIProvider>
-      <AuthContextProvider>
+      {/* <AuthContextProvider> */}
+      <ClerkProvider>
         {children}
-      </AuthContextProvider>
+      {/* </AuthContextProvider> */}
+      </ClerkProvider>
     </NextUIProvider>
   )
 }
