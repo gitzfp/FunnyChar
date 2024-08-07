@@ -4,7 +4,7 @@ import { RxHamburgerMenu, RxCross2 } from 'react-icons/rx';
 import { BiSolidLockAlt } from 'react-icons/bi';
 import styles from './HamburgerMenu.module.css';
 import { useAppStore } from '@/zustand/store';
-import { useAuthContext } from '@/context/AuthContext';
+import { useUser } from '@clerk/nextjs';
 
 export default function HamburgerMenu() {
   const [open, cycleOpen] = useCycle(false, true);
@@ -34,7 +34,7 @@ export default function HamburgerMenu() {
     isJournalMode,
     setIsJournalMode,
   } = useAppStore();
-  const { user } = useAuthContext();
+  const { user } = useUser();
 
   return (
     <>

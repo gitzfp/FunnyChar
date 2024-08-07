@@ -2,17 +2,14 @@
 'use client'
 
 import { NextUIProvider } from '@nextui-org/react';
-import { AuthContextProvider } from '@/context/AuthContext';
 import { ClerkProvider } from '@clerk/nextjs';
 
 
 export function Providers({ children }) {
   return (
     <NextUIProvider>
-      {/* <AuthContextProvider> */}
-      <ClerkProvider>
+      <ClerkProvider publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}>
         {children}
-      {/* </AuthContextProvider> */}
       </ClerkProvider>
     </NextUIProvider>
   )

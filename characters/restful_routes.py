@@ -222,13 +222,14 @@ async def upload_file(file: UploadFile = File(...), user=Depends(get_current_use
 
 
 @router.post("/uploadfile")
-async def upload_file(file: UploadFile = File(...), user=Depends(get_current_user)):
-    if not user:
-        raise HTTPException(
-            status_code=http_status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid authentication credentials",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+async def upload_file(file: UploadFile = File(...)):
+    # TODO Check user
+    # if not user:
+    #     raise HTTPException(
+    #         status_code=http_status.HTTP_401_UNAUTHORIZED,
+    #         detail="Invalid authentication credentials",
+    #         headers={"WWW-Authenticate": "Bearer"},
+    #     )
 
     storage_client = storage.Client()
     bucket_name = os.environ.get("GCP_STORAGE_BUCKET_NAME")
@@ -244,7 +245,7 @@ async def upload_file(file: UploadFile = File(...), user=Depends(get_current_use
     file_extension = os.path.splitext(
         file.filename)[1] if file.filename else ""
     new_filename = (
-        f"user_upload/{user['uid']}/"
+        f"user_upload/"
         f"{datetime.datetime.now().strftime('%Y%m%d-%H%M%S')}-"
         f"{uuid.uuid4()}{file_extension}"
     )
@@ -261,19 +262,20 @@ async def upload_file(file: UploadFile = File(...), user=Depends(get_current_use
 @router.post("/create_character")
 async def create_character(
     character_request: CharacterRequest,
-    user=Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    if not user:
-        raise HTTPException(
-            status_code=http_status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid authentication credentials",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+    # TODO Check user
+    # if not user:
+    #     raise HTTPException(
+    #         status_code=http_status.HTTP_401_UNAUTHORIZED,
+    #         detail="Invalid authentication credentials",
+    #         headers={"WWW-Authenticate": "Bearer"},
+    #     )
     character = Character(**character_request.dict())
     character.id = str(uuid.uuid4().hex)  # type: ignore
     character.background_text = character_request.background_text  # type: ignore
-    character.author_id = user["uid"]
+    character.author_id = ''
+    # character.author_id = user["uid"]
     now_time = datetime.datetime.now()
     character.created_at = now_time  # type: ignore
     character.updated_at = now_time  # type: ignore

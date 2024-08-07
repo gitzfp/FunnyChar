@@ -14,15 +14,12 @@ export default function Tabs({ characters }) {
   const { tabNow, setTabNow } = useAppStore();
   const searchParams = useSearchParams();
 
-  useEffect(() => {
-    if (isLoaded && !user) {
-      // 用户未登录时跳转到登录页面
-      router.push('/sign-in');
-    }
-  }, [isLoaded, user]);
- 
+
+  console.log(user, "=====登录=====")
 
   useEffect(() => {
+    document.documentElement.classList.remove('dark'); // 强制移除 dark 类
+
     const tab = searchParams.get('tab');
     if (tab) {
       setTabNow(tab);

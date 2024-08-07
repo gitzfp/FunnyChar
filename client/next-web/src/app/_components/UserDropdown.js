@@ -5,12 +5,14 @@ import {
   DropdownItem
 } from '@nextui-org/dropdown';
 import { Avatar } from '@nextui-org/avatar';
-import signout from '@/firebase/auth/signout';
+// import signout from '@/firebase/auth/signout';
 import {useAppStore} from "@/zustand/store";
 import {useEffect} from "react";
+import { useAuth } from '@clerk/nextjs';
 
 export default function UserDropdown({ user }) {
   const {setToken} = useAppStore();
+  const {signOut} = useAuth()
   useEffect(()=> {
     setToken(user.accessToken);
   }, []);
@@ -23,7 +25,7 @@ export default function UserDropdown({ user }) {
       // case 'delete':
       //   return;
       case 'logout':
-        const { result, error } = await signout();
+        const { result, error } = await signOut();
         if (error) {
           console.log(error);
           return;
