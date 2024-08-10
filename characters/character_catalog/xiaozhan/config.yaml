@@ -17,6 +17,3 @@ text_to_speech_use: XTTS
 voice_id: xiaozhan
 visibility: public
 order: 1
-
-rebyte_api_project_id: d4e521a67bb8189c2189
-rebyte_api_agent_id: abe5a1d0e79ae958f0ca

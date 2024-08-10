@@ -14,7 +14,6 @@ export default function Tabs({ characters }) {
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    // document.documentElement.classList.remove('dark'); // 强制移除 dark 类
     const tab = searchParams.get('tab');
     if (tab) {
       setTabNow(tab);

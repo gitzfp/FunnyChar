@@ -469,12 +469,12 @@ async def system_prompt(request: GeneratePromptRequest, user=Depends(get_current
             status_code=http_status.HTTP_400_BAD_REQUEST,
             detail="Name is empty",
         )
-    if not user:
-        raise HTTPException(
-            status_code=http_status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid authentication credentials",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+    # if not user:
+        # raise HTTPException(
+        #     status_code=http_status.HTTP_401_UNAUTHORIZED,
+        #     detail="Invalid authentication credentials",
+        #     headers={"WWW-Authenticate": "Bearer"},
+        # )
     return {"system_prompt": await generate_system_prompt(name, background)}
 
 

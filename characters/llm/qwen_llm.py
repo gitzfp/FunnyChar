@@ -1,8 +1,6 @@
-import os
 from typing import Optional, List, Dict, Any
 from uuid import uuid4
 
-from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 from langchain.schema import BaseMessage, HumanMessage, AIMessage, SystemMessage
 
 from characters.llm.base import AsyncCallbackAudioHandler, AsyncCallbackTextHandler, LLM
@@ -11,7 +9,6 @@ from characters.utils import Character, timed
 from characters.database.chroma import get_chroma
 
 logger = get_logger(__name__)
-os.environ['DASHSCOPE_API_KEY'] = "sk-b9bbfde1f3fb4961aeb3aa0d1e333d9c"
 
 # 选用RolePlay 配置agent
 from modelscope_agent.agents.role_play import RolePlay  # NOQA
@@ -32,7 +29,7 @@ class RunInfo:
 class TongyiLlm(LLM):
     def __init__(self, model):
         self.config = {'model': 'qwen-max', 'model_server': 'dashscope'}
-        self.db = get_chroma()
+        self.db = get_chroma(model)
 
     def get_config(self):
         return self.config

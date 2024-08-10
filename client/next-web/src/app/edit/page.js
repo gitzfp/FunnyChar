@@ -122,18 +122,18 @@ export default function EditCharacter() {
         </div>
         <div className="flex flex-col gap-3">
           <h4 className="font-medium text-lg">System Prompt(required)</h4>
-          <p className="text-small">
+          {/* <p className="text-small">
             You can auto-generate the prompt based on character name and
             background
-          </p>
+          </p> */}
           <div className="flex flex-col w-fit">
-            <Button
+            {/* <Button
               onPress={autoGenerate}
               isLoading={formData.system_prompt === 'Generating...'}
               className="bg-real-contrastBlue"
             >
               Auto generate
-            </Button>
+            </Button> */}
             <span className="text-tiny text-warning">
               * It may take ~1 minute
             </span>

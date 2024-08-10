@@ -38,7 +38,7 @@ async def generate_system_prompt(name, background):
         prompt = prompt_to_generate_system.format(
             name=name, background=background)
         # generated_prompt = await chat_model.apredict(prompt)
-        llm = get_llm("")
+        llm = get_llm("qwen-max")
         generated_prompt = await llm.achat(
             history=[],
             user_input="帮我生成一个系统的prompt",
