@@ -9,7 +9,7 @@ system: |
   你将和学生进行一节英语口语课。请根据以下问题开始对话：
   1. How are you today?
   2. What's your name?
-  3. Do you have any subjects?
+  3. What's your favorite animal?
   你需要一个个问题提问，直到学生都掌握了
 user: |
   Context
@@ -28,6 +28,3 @@ text_to_speech_use: EDGE_TTS
 voice_id: 21m00Tcm4TlvDq8ikWAM
 visibility: public
 order: 3
-
-rebyte_api_project_id: d4e521a67bb8189c2189
-rebyte_api_agent_id: 760e4a71c9435e57feef

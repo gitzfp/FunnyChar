@@ -350,11 +350,14 @@ async def handle_receive(
                 message_id = str(uuid.uuid4().hex)[:16]
 
                 async def text_mode_tts_task_done_call_back(response):
+                    logger.info(
+                        f"text_mode_tts_task_done_call_back is called, response: {response}")
                     # Send response to client, indicates the response is done
                     await manager.send_message(message=f"[end={message_id}]\n", websocket=websocket)
                     # Update conversation history
                     conversation_history.user.append(msg_data)
                     conversation_history.ai.append(response)
+                    logger.info(f"server message: {response}")
                     token_buffer.clear()
                     # Persist interaction in the database
                     tools = []
@@ -513,11 +516,14 @@ async def handle_receive(
                 message_id = str(uuid.uuid4().hex)[:16]
 
                 async def audio_mode_tts_task_done_call_back(response):
+                    logger.info("audio_mode_tts_task_done_call_back is called")
                     # Send response to client, [=] indicates the response is done
                     await manager.send_message(message="[=]", websocket=websocket)
                     # Update conversation history
                     conversation_history.user.append(transcript)
                     conversation_history.ai.append(response)
+                    logger.info(
+                        f"audio_mode_tts_task_done_call_back is called, {response}")
                     token_buffer.clear()
                     # Persist interaction in the database
                     tools = []

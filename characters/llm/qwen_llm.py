@@ -3,7 +3,7 @@ from typing import Optional, List, Dict, Any
 from uuid import uuid4
 
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
-from langchain.schema import BaseMessage, HumanMessage, AIMessage
+from langchain.schema import BaseMessage, HumanMessage, AIMessage, SystemMessage
 
 from characters.llm.base import AsyncCallbackAudioHandler, AsyncCallbackTextHandler, LLM
 from characters.logger import get_logger
@@ -57,27 +57,30 @@ class TongyiLlm(LLM):
 
             # 1. Generate context
             context = self._generate_context(user_input, character)
-            logger.debug(f"Generated context: {context}")
 
-            # 2. Add user input to history
-            history.append(
-                HumanMessage(
-                    content=character.llm_user_prompt.format(
-                        context=context, query=user_input)
-                )
-            )
+            # 将 history 和 character.llm_system_prompt 结合起来
+            messages = []
+            for msg in history:
+                if isinstance(msg, SystemMessage):
+                    # messages.append({"role": "system", "content": msg.content})
+                    continue
+                elif isinstance(msg, HumanMessage):
+                    messages.append({"role": "user", "content": msg.content})
+                elif isinstance(msg, AIMessage):
+                    messages.append(
+                        {"role": "assistant", "content": msg.content})
+
             logger.debug(f"History after adding user input: {history}")
 
             bot = RolePlay(
-                function_list=[], llm=self.config, instruction=character.llm_system_prompt)
-            response = bot.run(user_input)  # 确保这里是同步调用
+                function_list=[], llm=self.config, instruction=context)
+            response = bot.run(user_input, messages)
 
             text = ''
             for chunk in response:
                 text += chunk
-                await callback.on_new_token(chunk)  # 调用callback
-                logger.info(
-                    f"qwen response===========: {chunk}")
+                await callback.on_llm_new_token(chunk)  # 调用callback
+
                 if audioCallback is not None:
                     await audioCallback.on_llm_new_token(chunk)  # 调用音频回调
 
@@ -86,6 +89,8 @@ class TongyiLlm(LLM):
             text += f"[end={run_id}]"
 
             await callback.on_llm_end(text)
+            logger.info(
+                f"qwen response===========: {text}")
             if audioCallback is not None:
                 await audioCallback.on_llm_end(text)  # 调用音频回调
 
@@ -133,7 +138,7 @@ class TongyiLlm(LLM):
         logger.debug(f"Generated context: {context}")
 
         # # 添加系统提示
-        # full_context = f"{character.llm_system_prompt}\n{context}"
-        # logger.debug(f"Generated full context: {full_context}")
+        full_context = f"{character.llm_system_prompt}\n{context}"
+        logger.debug(f"Generated full context: {full_context}")
 
-        return context
+        return full_context

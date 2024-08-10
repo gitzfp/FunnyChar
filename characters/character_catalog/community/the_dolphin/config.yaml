@@ -22,9 +22,6 @@ user: |
   ---
   {query}
 text_to_speech_use: ELEVEN_LABS
-voice_id: MdSf3TEyH2iqTIQX9C50
+voice_id: pNInz6obpgDQGcFmaJgB
 author_name: mattjeet
 visibility: public
-
-rebyte_api_project_id: d4e521a67bb8189c2189
-rebyte_api_agent_id: a05b7ce003b2dd048f14

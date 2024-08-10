@@ -1,8 +1,5 @@
-# flake8: noqa
-from langchain.schema.messages import BaseMessage, ChatMessage
-from rebyte_langchain.rebyte_langchain import RebyteEndpoint
-
-from characters.llm import get_chat_model_from_env
+from characters.llm import get_llm
+from characters.utils import Character
 
 
 prompt_to_generate_system = """
@@ -35,21 +32,22 @@ When Elon Musk reply, stay in character as Elon, never admit you are an AI.
 
 
 async def generate_system_prompt(name, background):
-    chat_model = get_chat_model_from_env()
+    # chat_model = get_chat_model_from_env()
     if background is not None and background != "":
         background = f"Background: {background}"
-
-    if isinstance(chat_model, RebyteEndpoint):
-        chat_model.project_id = "d4e521a67bb8189c2189"
-        chat_model.agent_id = "3ccb398ca17a303f5d67"
-        chat_model.streaming = True
-
-        system_prompt_messages: list[BaseMessage] = [ChatMessage(role=name, content=background)]
-        response = await chat_model.agenerate(
-            messages=[system_prompt_messages],
+        prompt = prompt_to_generate_system.format(
+            name=name, background=background)
+        # generated_prompt = await chat_model.apredict(prompt)
+        llm = get_llm("")
+        generated_prompt = await llm.achat(
+            history=[],
+            user_input="帮我生成一个系统的prompt",
+            user_id='',
+            character=Character(
+                character_id="unique_id",
+                name="Character Name",
+                llm_system_prompt=prompt,
+                llm_user_prompt="User Prompt Here"
+            ),
         )
-        return response.generations[0][0].text
-    else:
-        prompt = prompt_to_generate_system.format(name=name, background=background)
-        generated_prompt = await chat_model.apredict(prompt)
         return generated_prompt

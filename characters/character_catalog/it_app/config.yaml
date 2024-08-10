@@ -22,10 +22,9 @@ user: |
   ---
   {query}
 
-text_to_speech_use: XTTS
-voice_id: yuli
+text_to_speech_use: EDGE_TTS
+voice_id: 21m00Tcm4TlvDq8ikWAM
 visibility: public
-order: 1
+order: 3
 
-rebyte_api_project_id: d4e521a67bb8189c2189
-rebyte_api_agent_id: 23536d65c54f4d7680cd
+
