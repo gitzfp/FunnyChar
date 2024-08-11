@@ -28,7 +28,7 @@ export default function CharacterCard({
       );
       router.push(`/conversation?character=${compressedCharacter}`);
     }}>
-      <CardBody className="p-0 text-center flex-row  md:flex-col" onClick={() => {
+      <CardBody className="p-0 text-center flex-row  md:flex-col cursor-pointer" onClick={() => {
       const compressedCharacter = lz.compressToEncodedURIComponent(
         JSON.stringify(character)
       );

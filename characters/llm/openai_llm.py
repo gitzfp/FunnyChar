@@ -53,7 +53,9 @@ class OpenaiLlm(LLM):
         logger.debug(f"Character configuration: {character}")
 
         # 将 history 和 character.llm_system_prompt 结合起来
-        messages = [{"role": "system", "content": character.llm_system_prompt}]
+        if len(character.llm_system_prompt):
+            messages = [
+                {"role": "system", "content": character.llm_system_prompt}]
 
         # 将 history 转换为合适的格式并添加到 messages 中
         for msg in history:
@@ -65,11 +67,12 @@ class OpenaiLlm(LLM):
                 messages.append({"role": "assistant", "content": msg.content})
 
         # 添加用户当前输入
-        messages.append({"role": "user", "content": user_input})
+        if len(user_input) > 0:
+            messages.append({"role": "user", "content": user_input})
 
         # 调用 OpenAI 的 API
         response_stream = self.chat_open_ai.chat.completions.create(
-            model="gpt-4o",
+            model="gpt-4o-mini",
             messages=messages,
             user=self.conversation_id,
             stream=True  # Ensure streaming is enabled

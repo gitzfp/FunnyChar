@@ -9,6 +9,12 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@react-three/drei": "9.75.0",
+    "@react-three/fiber": "8.13.3",
+    "@react-three/xr": "^5.7.1",
+    "three": "0.153.0",
+    "@types/three": "0.152.1",
+    "leva": "^0.9.35",
     "@clerk/nextjs": "^5.2.14",
     "@nextui-org/avatar": "^2.0.21",
     "@nextui-org/react": "^2.1.13",

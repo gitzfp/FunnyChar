@@ -7,6 +7,7 @@ from characters.audio.speech_to_text import get_speech_to_text
 from characters.audio.text_to_speech import get_text_to_speech
 from characters.character_catalog.catalog_manager import CatalogManager
 from characters.restful_routes import router as restful_router
+from characters.chat_routes import router as chat_router
 from characters.utils import ConnectionManager
 from characters.websocket_routes import router as websocket_router
 
@@ -35,6 +36,7 @@ app.add_middleware(
 )
 
 app.include_router(restful_router)
+app.include_router(chat_router)
 app.include_router(websocket_router)
 
 # initializations

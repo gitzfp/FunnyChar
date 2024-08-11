@@ -61,3 +61,4 @@ aiofiles
 langchain
 langchain-core
 langsmith
+elevenlabs==1.6.1

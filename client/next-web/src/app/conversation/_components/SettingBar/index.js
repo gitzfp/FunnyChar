@@ -6,6 +6,7 @@ import SettingsButton from './SettingsButton';
 import { Avatar } from '@nextui-org/avatar';
 import { useAppStore } from '@/zustand/store';
 import { FaExternalLinkAlt } from "react-icons/fa";
+import MetaHuman from '../../../R3f/page';
 
 export default function SettingBar({
   isTextMode,
@@ -84,13 +85,14 @@ export default function SettingBar({
           </p>
           <div className="mt-4 flex flex-row gap-4 md:gap-8 justify-center">
             <div>
-              <Avatar
+              {/* <Avatar
                 name={character.name}
                 src={character.image_url}
                 classNames={{
                   base: 'block w-56 h-56 mx-auto',
                 }}
-              />
+              /> */}
+              <MetaHuman />
             </div>
             <div className="flex flex-col gap-8 justify-end">
               <SpeakerControl
