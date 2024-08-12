@@ -27,11 +27,11 @@ export const createSettingSlice = (set, get) => ({
       name: 'gpt-4o-mini',
       tooltip: 'OpenAI最强大模型',
     },
-    {
-      id: 'qwen-max',
-      name: 'qwen-max',
-      tooltip: '通义千问',
-    },
+    // {
+    //   id: 'qwen-max',
+    //   name: 'qwen-max',
+    //   tooltip: '通义千问',
+    // },
   ],
   speakerList: [],
   microphoneList: [],
