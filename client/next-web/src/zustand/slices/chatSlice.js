@@ -19,10 +19,19 @@ export const createChatSlice = (set, get) => ({
 
   chatContent: [],
 
-  appendChatContent: () =>{
-    set((state) => ({
-        interimChat: null,
-        chatContent: [...state.chatContent, {...state.interimChat}]}));
+  appendChatContent: (audioUrl) =>{
+      set((state) => {
+        const interimChat = { ...state.interimChat };
+        
+        if (audioUrl) {
+            interimChat.audioUrl = audioUrl;
+        }
+        
+        return {
+            chatContent: [...state.chatContent, interimChat],
+            interimChat: null,
+        };
+    });
   },
   appendUserChat: (chat) => {
       set((state) => ({

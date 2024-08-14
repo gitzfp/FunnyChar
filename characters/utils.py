@@ -1,7 +1,10 @@
 import asyncio
 from dataclasses import field
+import datetime
+import os
 from time import perf_counter
 from typing import Callable, Optional, TypedDict
+import uuid
 
 from langchain.schema import AIMessage, BaseMessage, HumanMessage, SystemMessage
 from pydantic.dataclasses import dataclass
@@ -10,6 +13,8 @@ from sqlalchemy.orm import Session
 
 from characters.models.interaction import Interaction
 from characters.logger import get_logger
+from google.cloud import storage
+from fastapi import HTTPException, status as http_status
 
 
 logger = get_logger(__name__)
@@ -211,3 +216,44 @@ def task_done_callback(task: asyncio.Task):
     exception = task.exception()
     if exception:
         logger.error(f"Error in task {task.get_name()}: {exception}")
+
+
+async def upload_audio_to_gcs(audio_bytes: bytes, filename_prefix: str = "audio/") -> str:
+    """
+    上传音频文件到 Google Cloud Storage.
+
+    参数:
+    - audio_bytes: 需要上传的音频文件数据.
+    - filename_prefix: 存储在 GCS 中的文件名前缀.
+
+    返回值:
+    - 存储在 GCS 中的文件的完整路径.
+    """
+    # 初始化 Google Cloud Storage 客户端
+    storage_client = storage.Client()
+
+    # 获取存储桶名称
+    bucket_name = os.environ.get("GCP_STORAGE_BUCKET_NAME")
+    if not bucket_name:
+        raise HTTPException(
+            status_code=http_status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="GCP_STORAGE_BUCKET_NAME is not set",
+        )
+
+    bucket = storage_client.bucket(bucket_name)
+
+    # 创建唯一的文件名
+    new_filename = (
+        f"{filename_prefix}"
+        f"{datetime.datetime.now().strftime('%Y%m%d-%H%M%S')}-"
+        f"{uuid.uuid4()}.wav"  # 假设上传的音频文件是 wav 格式
+    )
+
+    # 创建一个 GCS blob 对象
+    blob = bucket.blob(new_filename)
+
+    # 上传音频文件到 GCS
+    await asyncio.to_thread(blob.upload_from_string, audio_bytes)
+
+    # 返回文件的完整路径
+    return f"https://storage.googleapis.com/{bucket_name}/{new_filename}"

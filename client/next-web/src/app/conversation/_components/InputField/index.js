@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Button } from '@nextui-org/button';
-import InputEmoji from 'react-input-emoji';
+// import InputEmoji from 'react-input-emoji';
 import { IoIosSend } from 'react-icons/io';
 import ClickToTalk from './ClickToTalk';
 
@@ -56,7 +56,7 @@ export default function InputField() {
 
   const renderBottomButtons = () => {
     return <><div>
-            <InputEmoji
+            {/* <InputEmoji
               value={text}
               onChange={setText}
               cleanOnEnter
@@ -64,7 +64,7 @@ export default function InputField() {
               placeholder='Your turn'
               fontSize={16}
               fontFamily=''
-            />
+            /> */}
           </div>
           <div className='flex flex-row justify-between items-center'>
             <div className='pl-2 flex flex-row gap-1'>

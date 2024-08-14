@@ -1,6 +1,7 @@
 import io
 import os
 import types
+import time  # 导入 time 模块
 
 import speech_recognition as sr
 from pydub import AudioSegment
@@ -49,6 +50,7 @@ class DeepgramTranscriber(Singleton, SpeechToText):
     @timed
     def transcribe(self, audio_bytes, platform, prompt="", language="en-US", suppress_tokens=[-1]):
         logger.info("Transcribing audio...")
+        start_time = time.time()  # 开始计时
         if platform == "web":
             audio = self._convert_webm_to_wav(audio_bytes)
         elif platform == "twilio":
@@ -57,7 +59,14 @@ class DeepgramTranscriber(Singleton, SpeechToText):
             audio = self._convert_bytes_to_wav(audio_bytes)
 
         if self.use == "api":
-            return self._transcribe_api(audio, prompt, language)
+            result = self._transcribe_api(audio, prompt, language)
+        else:
+            result = ""
+
+        end_time = time.time()  # 结束计时
+        elapsed_time = end_time - start_time  # 计算识别所用时间
+        logger.info(f"Transcription took {elapsed_time:.2f} seconds")
+        return result
 
     def _transcribe_api(self, audio, prompt="", language="en-US"):
         language = DEEPGRAM_LANGUAGE_CODE_MAPPING.get(

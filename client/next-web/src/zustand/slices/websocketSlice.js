@@ -52,6 +52,17 @@ export const createWebsocketSlice = (set, get) => ({
         const timestamp = message.split('&timestamp=')[1].split('&duration')[0];
         const duration = message.split('&duration=')[1];
         get().appendTranscriptContent(id, speakerId, text, timestamp, duration);
+      } else if(message.startsWith('[+transcript_audio]')) {
+        const text = message.split('?text=')[1].split('&audioUrl=')[0];
+        const audioUrl = message.split('&audioUrl=')[1];
+         // Interrupted message has no end signal, so manually clear it.
+        if (get().speechInterim != null) {
+          get().appendChatContent();
+        }
+        get().setSender('user');
+        get().appendInterimChatContent(text);
+        get().appendChatContent(audioUrl);
+        get().clearSpeechInterim();
       } else {
         get().setSender('character');
         get().appendInterimChatContent(event.data);

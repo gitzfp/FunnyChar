@@ -27,6 +27,7 @@ from characters.utils import (
     get_timer,
     task_done_callback,
     Transcript,
+    upload_audio_to_gcs,
 )
 
 
@@ -289,6 +290,30 @@ async def handle_receive(
                     pass
                 tts_event.clear()
 
+        async def process_audio(binary_data, platform, character, language):
+            try:
+                # 并发执行上传和转录任务
+                transcript, audio_url = await asyncio.gather(
+                    asyncio.to_thread(
+                        speech_to_text.transcribe,
+                        binary_data,
+                        platform=platform,
+                        prompt=character.name,
+                        language=language,
+                    ),  # 去除转录文本首尾的空白字符,
+                    upload_audio_to_gcs(
+                        binary_data,
+                    )
+                )
+
+                # 去除转录文本的两端空白字符
+                transcript = transcript.strip()
+                return transcript, audio_url
+
+            except Exception as e:
+                print(f"An error occurred: {e}")
+                return None, None  # 处理异常时返回 None 或者其他默认值
+
         speech_recognition_interim = False
         current_speech = ""
 
@@ -486,16 +511,8 @@ async def handle_receive(
                     continue
 
                 # 1. Transcribe audio
-                transcript: str = (
-                    await asyncio.to_thread(
-                        speech_to_text.transcribe,
-                        binary_data,
-                        platform=platform,
-                        prompt=character.name,
-                        language=language,
-                    )
-                ).strip()
-
+                transcript, audio_url = await process_audio(binary_data, platform, character, language)
+                print(f"翻译文字: {transcript}, 音频文件：{audio_url}")
                 # ignore audio that picks up background noise
                 if not transcript or len(transcript) < 2:
                     continue
@@ -504,8 +521,18 @@ async def handle_receive(
                 timer.start("LLM First Token")
 
                 # 2. Send transcript to client
+                # await manager.send_message(
+                #     message=f"[+]You said: {transcript}", websocket=websocket
+                # )
                 await manager.send_message(
-                    message=f"[+]You said: {transcript}", websocket=websocket
+                    message=f"[+transcript_audio]"
+                    f"?text={transcript}"
+                    f"&audioUrl={audio_url}",
+                    websocket=websocket,
+                )
+                logger.info(
+                    f"Message sent to client: text = {transcript}, "
+                    f"audioUrl = {audio_url}, "
                 )
 
                 # 3. stop the previous audio stream, if new transcript is received
@@ -539,6 +566,7 @@ async def handle_receive(
                         language=language,
                         message_id=message_id,
                         llm_config=llm.get_config(),
+                        audio_url=audio_url
                     )
                     await asyncio.to_thread(interaction.save, db)
 

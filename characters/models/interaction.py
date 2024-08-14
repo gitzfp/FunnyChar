@@ -28,6 +28,7 @@ class Interaction(Base):
     language = Column(String(10))
     message_id = Column(String(64))
     llm_config = Column(JSON())
+    audio_url = Column(String(255), nullable=True)
 
     def to_dict(self):
         return {
