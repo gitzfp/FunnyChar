@@ -53,16 +53,39 @@ export const createWebsocketSlice = (set, get) => ({
         const duration = message.split('&duration=')[1];
         get().appendTranscriptContent(id, speakerId, text, timestamp, duration);
       } else if(message.startsWith('[+transcript_audio]')) {
-        const text = message.split('?text=')[1].split('&audioUrl=')[0];
-        const audioUrl = message.split('&audioUrl=')[1];
-         // Interrupted message has no end signal, so manually clear it.
-        if (get().speechInterim != null) {
-          get().appendChatContent();
-        }
-        get().setSender('user');
-        get().appendInterimChatContent(text);
-        get().appendChatContent(audioUrl);
-        get().clearSpeechInterim();
+         try{
+            // 使用正则表达式提取参数值
+            console.log("webcoketSlice收到消息:", message)
+            const params = new URLSearchParams(message.substring(message.indexOf('?')));
+            const text = params.get('text');
+            const audioUrl = params.get('audioUrl');
+            const messageId = params.get('messageId');
+            const speechResult = params.get('speechResult')
+            const currentState = get();
+
+            // 检查是否有中断的消息需要处理
+            if (currentState.speechInterim != null) {
+                currentState.appendChatContent();
+            }
+
+            // 设置发送者和处理消息内容
+            currentState.setSender('user');
+            if(params.get('from')){
+              currentState.setSender(params.get('from')); 
+            }
+            currentState.appendInterimChatContent(text);
+
+            // 追加或更新聊天内容
+            currentState.appendChatContent(messageId, {
+              text,
+              audioUrl,
+              speechResult: speechResult ? JSON.parse(speechResult) : ""
+            });
+            // 清除临时语音内容
+            currentState.clearSpeechInterim(); 
+         }catch(err){
+            console.log("捕获到错误消息", err)
+         }
       } else {
         get().setSender('character');
         get().appendInterimChatContent(event.data);

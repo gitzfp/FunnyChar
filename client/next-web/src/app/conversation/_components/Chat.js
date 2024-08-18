@@ -15,6 +15,12 @@ export default function Chat() {
   const messageEndRef = useRef(null);
   const [playingId, setPlayingId] = useState('')
   const audioRef = useRef(null)
+  const [expandedId, setExpandedId] = useState('');
+
+  const toggleExpand = (messageId) => {
+    setExpandedId(messageId);
+  };
+
 
   useEffect(() => {
     messageEndRef.current.scrollIntoView({
@@ -77,6 +83,10 @@ export default function Chat() {
               </div>
             );
           } else if (line && line.hasOwnProperty('from') && line.from === 'user') {
+            let speechResult;
+            if(line.speechResult && line.speechResult?.NBest?.length > 0){
+              speechResult =  line.speechResult.NBest[0]
+            }
             return (
               <div
                 key={line.timestamp}
@@ -110,7 +120,55 @@ export default function Chat() {
                   </div>
                 
                 }
-                </div>)
+                {speechResult && (
+                    <div className="mt-4 p-2 bg-green-50 border border-green-200 rounded-md shadow-md w-full max-w-md">
+                      {/* 原文展示 */}
+                      <div className="text-center text-sm font-medium mb-2">{line.content}</div>
+
+                      {/* 评分展示 */}
+                      <div className="grid grid-cols-4 gap-2 text-center font-semibold text-sm mb-2">
+                        <div>准确度</div>
+                        <div>流利度</div>
+                        <div>完整度</div>
+                        <div>发音得分</div>
+                      </div>
+                      <div className="grid grid-cols-4 gap-2 text-center mb-2">
+                        <div>{speechResult.AccuracyScore}</div>
+                        <div>{speechResult.FluencyScore}</div>
+                        <div>{speechResult.CompletenessScore}</div>
+                        <div>{speechResult.PronScore}</div>
+                      </div>
+
+                      {expandedId === line.messageId && (
+                        <div className={`transition-all duration-500 ${expandedId === line.messageId ? 'max-h-full' : 'max-h-40'} overflow-hidden`}>
+                          <div className="grid grid-cols-3 gap-2">
+                            {speechResult.Words.map((word, index) => (
+                              <div key={index} className="text-center">
+                                <div className="bg-green-200 p-1 rounded-t-md text-green-800 font-semibold text-xs">
+                                  {word.Word}<span className="text-xs align-top"> {word.AccuracyScore}</span>
+                                </div>
+                                <div className="grid grid-cols-3 gap-1">
+                                  {word.Phonemes.map((phoneme, pIndex) => (
+                                    <div key={pIndex} className="p-1 bg-green-500 text-white font-semibold text-xs">
+                                      {phoneme.Phoneme}
+                                      <span className="block text-sm font-normal">{phoneme.AccuracyScore}</span>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="text-center mt-2">
+                        <button onClick={() => toggleExpand(line.messageId)} className="text-blue-500 underline text-sm">
+                          {expandedId === line.messageId ? 'Show Less' : 'Show More'}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+          </div>)
           } else if (line && line.hasOwnProperty('from') && line.from === 'message') {
             return (
               <div

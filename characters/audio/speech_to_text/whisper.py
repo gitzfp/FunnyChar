@@ -13,8 +13,8 @@ from characters.logger import get_logger
 from characters.utils import Singleton, timed
 from openai import OpenAI
 client = OpenAI(
-    base_url=os.getenv('OPENAI_BASE_URL'),
-    api_key=os.getenv('OPENAI_API_KEY', 'api_key')
+    base_url=os.getenv('OPENAI_WHISPER_BASE_URL'),
+    api_key=os.getenv('OPENAI_WHISPER_API_KEY', 'api_key')
 )
 
 logger = get_logger(__name__)

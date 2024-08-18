@@ -90,14 +90,11 @@ class OpenaiLlm(LLM):
                         await audioCallback.on_llm_new_token(chunk)  # 调用音频回调
             self.conversation_id = message.id
 
-        logger.debug(
-            f"conversation_id:{self.conversation_id}Final response: {reply}=====》》》》====message: {message}")
         run_id = uuid4()
         reply += f"[end={run_id}]"
-        logger.info("Calling on_llm_end callback %s",
-                    reply, exc_info="on_llm_end调用")
+        logger.debug(
+            f"会话id:{self.conversation_id} 回复: {reply}====消息: {message}")
         await callback.on_llm_end(reply)
         if audioCallback is not None:
             await audioCallback.on_llm_end(reply)  # 调用音频回调
-        logger.info(f"After calling on_llm_end,{reply}")
         return reply

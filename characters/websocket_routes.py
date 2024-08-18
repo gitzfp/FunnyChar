@@ -11,6 +11,7 @@ from sqlalchemy.orm import Session
 
 from characters.audio.speech_to_text import get_speech_to_text, SpeechToText
 from characters.audio.text_to_speech import get_text_to_speech, TextToSpeech
+from characters.audio_process_service import AudioProcessService
 from characters.character_catalog.catalog_manager import (
     CatalogManager,
     get_catalog_manager,
@@ -27,7 +28,6 @@ from characters.utils import (
     get_timer,
     task_done_callback,
     Transcript,
-    upload_audio_to_gcs,
 )
 
 
@@ -290,30 +290,6 @@ async def handle_receive(
                     pass
                 tts_event.clear()
 
-        async def process_audio(binary_data, platform, character, language):
-            try:
-                # 并发执行上传和转录任务
-                transcript, audio_url = await asyncio.gather(
-                    asyncio.to_thread(
-                        speech_to_text.transcribe,
-                        binary_data,
-                        platform=platform,
-                        prompt=character.name,
-                        language=language,
-                    ),  # 去除转录文本首尾的空白字符,
-                    upload_audio_to_gcs(
-                        binary_data,
-                    )
-                )
-
-                # 去除转录文本的两端空白字符
-                transcript = transcript.strip()
-                return transcript, audio_url
-
-            except Exception as e:
-                print(f"An error occurred: {e}")
-                return None, None  # 处理异常时返回 None 或者其他默认值
-
         speech_recognition_interim = False
         current_speech = ""
 
@@ -357,6 +333,7 @@ async def handle_receive(
                     continue
 
                 # 2. If client finished speech, use the sentence as input.
+                message_id = str(uuid.uuid4().hex)[:16]
                 if msg_data.startswith("[SpeechFinished]"):
                     msg_data = current_speech
                     logger.info(f"Full transcript: {current_speech}")
@@ -372,7 +349,6 @@ async def handle_receive(
                     current_speech = ""
 
                 # 3. Send message to LLM
-                message_id = str(uuid.uuid4().hex)[:16]
 
                 async def text_mode_tts_task_done_call_back(response):
                     logger.info(
@@ -511,66 +487,87 @@ async def handle_receive(
                     continue
 
                 # 1. Transcribe audio
-                transcript, audio_url = await process_audio(binary_data, platform, character, language)
+                message_id = str(uuid.uuid4().hex)[:16]
+                audio_service = AudioProcessService()
+                transcript, audio_url = await audio_service.process_audio(binary_data, platform, character, message_id, websocket, manager)
                 print(f"翻译文字: {transcript}, 音频文件：{audio_url}")
+
                 # ignore audio that picks up background noise
                 if not transcript or len(transcript) < 2:
                     continue
 
+                # 2. Send Pronounation score
+                asyncio.create_task(
+                    audio_service.send_score(binary_data, transcript,
+                                             message_id, websocket, manager)
+                )
+
+                # 3. Save user message
+                interaction = Interaction(
+                    user_id=user_id,
+                    session_id=session_id,
+                    client_message_unicode=transcript,
+                    server_message_unicode="",
+                    platform=platform,
+                    action_type="audio",
+                    character_id=character_id,
+                    tools="",
+                    language=language,
+                    message_id=str(uuid.uuid4().hex)[:16],
+                    llm_config=llm.get_config(),
+                    audio_url=audio_url
+                )
+                await asyncio.to_thread(interaction.save, db)
+
                 # start counting time for LLM to generate the first token
                 timer.start("LLM First Token")
-
-                # 2. Send transcript to client
-                # await manager.send_message(
-                #     message=f"[+]You said: {transcript}", websocket=websocket
-                # )
-                await manager.send_message(
-                    message=f"[+transcript_audio]"
-                    f"?text={transcript}"
-                    f"&audioUrl={audio_url}",
-                    websocket=websocket,
-                )
-                logger.info(
-                    f"Message sent to client: text = {transcript}, "
-                    f"audioUrl = {audio_url}, "
-                )
 
                 # 3. stop the previous audio stream, if new transcript is received
                 await stop_audio()
 
                 previous_transcript = transcript
 
-                message_id = str(uuid.uuid4().hex)[:16]
+                async def audio_mode_tts_task_done_call_back(response, server_message_id, transcript, audio_url):
+                    try:
+                        logger.info(
+                            "audio_mode_tts_task_done_call_back is called >>>")
 
-                async def audio_mode_tts_task_done_call_back(response):
-                    logger.info("audio_mode_tts_task_done_call_back is called")
-                    # Send response to client, [=] indicates the response is done
-                    await manager.send_message(message="[=]", websocket=websocket)
-                    # Update conversation history
-                    conversation_history.user.append(transcript)
-                    conversation_history.ai.append(response)
-                    logger.info(
-                        f"audio_mode_tts_task_done_call_back is called, {response}")
-                    token_buffer.clear()
-                    # Persist interaction in the database
-                    tools = []
-                    interaction = Interaction(
-                        user_id=user_id,
-                        session_id=session_id,
-                        client_message_unicode=transcript,
-                        server_message_unicode=response,
-                        platform=platform,
-                        action_type="audio",
-                        character_id=character_id,
-                        tools=",".join(tools),
-                        language=language,
-                        message_id=message_id,
-                        llm_config=llm.get_config(),
-                        audio_url=audio_url
-                    )
-                    await asyncio.to_thread(interaction.save, db)
+                        # Send response to client, [=] indicates the response is done
+                        await manager.send_message(message=f"[+transcript_audio]"
+                                                   f"?text={response}&from=character&messageId={server_message_id}", websocket=websocket)
 
-                # 5. Send message to LLM
+                        # Update conversation history
+                        conversation_history.user.append(transcript)
+                        conversation_history.ai.append(response)
+                        logger.info(
+                            f"audio_mode_tts_task_done_call_back is called, {response}")
+                        token_buffer.clear()
+
+                        # Persist interaction in the database
+                        tools = []
+                        interaction = Interaction(
+                            user_id=user_id,
+                            session_id=session_id,
+                            client_message_unicode=transcript,
+                            server_message_unicode=response,
+                            platform=platform,
+                            action_type="audio",
+                            character_id=character_id,
+                            tools=",".join(tools),
+                            language=language,
+                            message_id=server_message_id,
+                            llm_config=llm.get_config(),
+                            audio_url=audio_url
+                        )
+                        await asyncio.to_thread(interaction.save, db)
+
+                    except Exception as e:
+                        # 记录异常信息
+                        logger.error(
+                            f"Error in audio_mode_tts_task_done_call_back: {str(e)}")
+
+                # 6. Send message to LLM
+                server_message_id = str(uuid.uuid4().hex)[:16]
                 tts_task = asyncio.create_task(
                     llm.achat(
                         history=build_history(conversation_history),
@@ -578,14 +575,17 @@ async def handle_receive(
                         user_id=user_id,
                         character=character,
                         callback=AsyncCallbackTextHandler(
-                            on_new_token, token_buffer, audio_mode_tts_task_done_call_back
+                            on_new_token,
+                            token_buffer=token_buffer,
+                            on_llm_end=lambda response, server_message_id=server_message_id, transcript=transcript, audio_url=audio_url, callback=audio_mode_tts_task_done_call_back: callback(
+                                response, server_message_id, transcript=transcript, audio_url=audio_url)
                         ),
                         audioCallback=AsyncCallbackAudioHandler(
                             text_to_speech, websocket, tts_event, character.voice_id, language
                         )
                         if not journal_mode
                         else None,
-                        metadata={"message_id": message_id,
+                        metadata={"message_id": server_message_id,
                                   "user_id": user_id},
                     )
                 )
