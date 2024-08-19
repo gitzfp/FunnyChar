@@ -56,9 +56,10 @@ tokenizers>=0.14,<0.19
 faster_whisper
 modelscope[framework]>=1.16.0
 deepgram-sdk
-mysqlclient
 aiofiles
 langchain
 langchain-core
 langsmith
 elevenlabs==1.6.1
+mysqlclient
+mysql-connector-python

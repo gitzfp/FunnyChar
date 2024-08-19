@@ -1,422 +1,224 @@
-# <img src="https://storage.googleapis.com/assistly/static/funnychar/funnychar.svg" height="24px" style="padding-top:4px"/>FunnyChar. - Your Realtime AI Character
+# <img src="https://storage.googleapis.com/assistly/static/funnychar/funnychar.svg" height="24px" style="padding-top:4px"/>FunnyChar - 实时 AI 角色
 
-<br/>
-<div align="center">
-    <img src="https://storage.googleapis.com/assistly/static/funnychar/logo.png" alt="FunnyChar-logo" width="80%"  style="padding: 40px"/>
-</div>
-<br/>
-<p align="center">
-  🎙️🤖<em>Create, customize and talk to your AI Character/Companion in realtime</em>🎙️🤖
-</p>
+## 🎯 主要功能
 
-<div align="center">
-    <a href="https://funnychar.ai/join-discord">
-    <img src="https://img.shields.io/badge/discord-join%20chat-blue.svg?style=for-the-badge" alt="Join our Discord" height="20">
-    </a>
-    <a href="https://twitter.com/agishaun">
-    <img alt="Twitter Follow" src="https://img.shields.io/twitter/follow/agishaun?style=for-the-badge" height="20">
-    <a href="https://github.com/Shaunwei/FunnyChar">
-    <img alt="GitHub" src="https://img.shields.io/github/stars/Shaunwei/FunnyChar?style=for-the-badge&color=gold" height="20">
-    </a>
-    <a href="https://github.com/Shaunwei/FunnyChar/commits/main">
-    <img alt="GitHub" src="https://img.shields.io/github/last-commit/Shaunwei/FunnyChar/main?style=for-the-badge" height="20">
-    </a>
-    <a href="https://github.com/Shaunwei/FunnyChar/blob/main/README.md" target="_blank">
-    <img src="https://img.shields.io/static/v1?label=license&message=MIT&color=green&style=for-the-badge" alt="License" height="20">
-    </a>
-    <a href="https://hub.docker.com/repository/docker/shaunly/real_char/general" target="_blank">
-    <img alt="Docker Pulls" src="https://img.shields.io/docker/pulls/shaunly/real_char?style=for-the-badge"  height="20">
-    </a>
-</div>
+- **易于使用**：无需编码即可创建自己的 AI 角色。
+- **可定制**：可以自定义 AI 角色的个性、背景，甚至是声音。
+- **实时**：可以实时与 AI 角色对话或发送消息。
+- **多平台**：可以在网页、终端和移动设备上与 AI 角色互动（我们开源了移动应用）。
+- **最新 AI 技术**：我们使用最新的 AI 技术来驱动你的 AI 角色，包括 OpenAI、Anthropic Claude 2、Chroma、Whisper、ElevenLabs 等。
+- **模块化**：可以轻松更换不同模块以定制你的流程。更少的意见，更大的灵活性。是开始 AI 工程师之旅的绝佳项目。
 
-## ✨ Demo
-
-Try our site at [FunnyChar.ai](https://funnychar.ai/)
-
-Not sure how to pronounce FunnyChar? Listen to this 👉 [audip](https://github.com/Shaunwei/FunnyChar/assets/6148473/45d4773c-eb4f-41e5-a162-f9513d650b76)
-
-### Demo 1 - with Santa Claus!
-
-https://github.com/Shaunwei/FunnyChar/assets/5101573/6b35a80e-5503-4850-973d-254039bd383c
-
-### Demo 2 - with AI Elon about cage fight!
-
-https://github.com/Shaunwei/FunnyChar/assets/5101573/5de0b023-6cf3-4947-84cb-596f429d109e
-
-### Demo 3 - with AI Raiden about AI and "real" memory
-
-https://github.com/Shaunwei/FunnyChar/assets/5101573/62a1f3d1-1166-4254-9119-97647be52c42
-
-**Demo settings: Web, GPT4, ElevenLabs with voice clone, Chroma, Google Speech to Text**
-
-## 🎯 Key Features
-
-- **Easy to use**: No coding required to create your own AI character.
-- **Customizable**: You can customize your AI character's personality, background, and even voice
-- **Realtime**: Talk to or message your AI character in realtime
-- **Multi-Platform**: You can talk to your AI character on web, terminal and mobile(Yes. we open source our mobile app)
-- **Most up-to-date AI**: We use the most up-to-date AI technology to power your AI character, including OpenAI, Anthropic Claude 2, Chroma, Whisper, ElevenLabs, etc.
-- **Modular**: You can easily swap out different modules to customize your flow. Less opinionated, more flexible. Great project to start your AI Engineering journey.
-
-## 🔬 Tech stack
+## 🔬 技术栈
 
 <div align="center">
     <img src="https://storage.googleapis.com/assistly/static/funnychar/techstackv004.jpg" alt="FunnyChar-tech-stack" width="100%"  style="padding: 20px"/>
 </div>
 
-- ✅**Web**: [React JS](https://react.dev/), [Vanilla JS](http://vanilla-js.com/), [WebSockets](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API)
-- ✅**Mobile**: [Swift](https://developer.apple.com/swift/), [WebSockets](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API)
-- ✅**Backend**: [FastAPI](https://fastapi.tiangolo.com/), [SQLite](https://www.sqlite.org/index.html), [Docker](https://www.docker.com/)
-- ✅**Data Ingestion**: [LlamaIndex](https://www.llamaindex.ai/), [Chroma](https://www.trychroma.com/)
-- ✅**LLM Orchestration**: [LangChain](https://langchain.com/), [Chroma](https://www.trychroma.com/)
-- ✅**LLM**: [ReByte](https://rebyte.ai/), [OpenAI GPT3.5/4](https://platform.openai.com/docs/api-reference/chat), [Anthropic Claude 2](https://docs.anthropic.com/claude/docs/getting-started-with-claude), [Anyscale Llama2](https://docs.endpoints.anyscale.com/supported-models/meta-llama-Llama-2-70b-chat-hf)
-- ✅**Speech to Text**: [Local WhisperX](https://github.com/m-bain/whisperX), [Local Whisper](https://github.com/openai/whisper), [OpenAI Whisper API](https://platform.openai.com/docs/api-reference/audio), [Google Speech to Text](https://cloud.google.com/speech-to-text/docs#docs)
-- ✅**Text to Speech**: [ElevenLabs](https://beta.elevenlabs.io/), [Edge TTS](https://github.com/rany2/edge-tts), [Google Text to Speech](https://cloud.google.com/text-to-speech?hl=en)
-- ✅**Voice Clone**: [ElevenLabs](https://beta.elevenlabs.io/voice-lab)
+- ✅**网页**： [React JS](https://react.dev/), [Vanilla JS](http://vanilla-js.com/), [WebSockets](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API)
+- ✅**移动**： [Swift](https://developer.apple.com/swift/), [WebSockets](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API)
+- ✅**后台**： [FastAPI](https://fastapi.tiangolo.com/), [SQLite](https://www.sqlite.org/index.html), [Docker](https://www.docker.com/)
+- ✅**数据摄取**： [LlamaIndex](https://www.llamaindex.ai/), [Chroma](https://www.trychroma.com/)
+- ✅**LLM 协调**： [LangChain](https://langchain.com/), [Chroma](https://www.trychroma.com/)
+- ✅**LLM**： [ReByte](https://rebyte.ai/), [OpenAI GPT3.5/4](https://platform.openai.com/docs/api-reference/chat), [Anthropic Claude 2](https://docs.anthropic.com/claude/docs/getting-started-with-claude), [Anyscale Llama2](https://docs.endpoints.anyscale.com/supported-models/meta-llama-Llama-2-70b-chat-hf)
+- ✅**语音转文本**： [Local WhisperX](https://github.com/m-bain/whisperX), [Local Whisper](https://github.com/openai/whisper), [OpenAI Whisper API](https://platform.openai.com/docs/api-reference/audio), [Google Speech to Text](https://cloud.google.com/speech-to-text/docs#docs)
+- ✅**文本转语音**： [ElevenLabs](https://beta.elevenlabs.io/), [Edge TTS](https://github.com/rany2/edge-tts), [Google Text to Speech](https://cloud.google.com/text-to-speech?hl=en)
+- ✅**声音克隆**： [ElevenLabs](https://beta.elevenlabs.io/voice-lab)
 
-## 📚 Comparison with existing products
+## 📚 与现有产品比较
 
 <div align="center">
     <img src="https://storage.googleapis.com/assistly/static/funnychar/compare.png">
 </div>
 
-## 📀 Quick Start - Installation via Docker
+## 📀 快速开始 - 使用 Docker 安装
 
-1.  Create a new `.env` file
+1. 创建新的 `.env` 文件
 
     ```sh
     cp .env.example .env
     ```
 
-    Paste your API keys in `.env` file. A single [ReByte](#11-rebyte-api-key) or [OpenAI](#12-optional-openai-api-token) API key is enough to get started.
+    将你的 API 密钥粘贴到 `.env` 文件中。一个 [ReByte](#11-rebyte-api-key) 或 [OpenAI](#12-optional-openai-api-token) API 密钥足以开始使用。
 
-    You can also configure other API keys if you have them.
+    你也可以配置其他 API 密钥（如果有的话）。
 
-1.  Start the app with `docker-compose.yaml`
+1. 使用 `docker-compose.yaml` 启动应用
 
     ```sh
     docker compose up
     ```
 
-    If you have issues with docker (especially on a non-Linux machine), please refer to https://docs.docker.com/get-docker/ (installation) and https://docs.docker.com/desktop/troubleshoot/overview/ (troubleshooting).
+    如果你在使用 Docker 时遇到问题（尤其是在非 Linux 机器上），请参考 https://docs.docker.com/get-docker/（安装）和 https://docs.docker.com/desktop/troubleshoot/overview/（故障排除）。
 
-1.  Open http://localhost:3000 and enjoy the app!
+1. 打开 http://localhost:3000 享受应用！
 
-## 💿 Developers - Installation via Python
+## 💿 开发者 - 使用 Python 安装
 
-- **Step 1**. Clone the repo
+- **步骤 1**. 克隆代码库
   ```sh
   git clone https://github.com/Shaunwei/FunnyChar.git && cd FunnyChar
   ```
-- **Step 2**. Install requirements
+- **步骤 2**. 安装依赖
 
-  Install [portaudio](https://people.csail.mit.edu/hubert/pyaudio/) and [ffmpeg](https://ffmpeg.org/download.html) for audio
+  安装 [portaudio](https://people.csail.mit.edu/hubert/pyaudio/) 和 [ffmpeg](https://ffmpeg.org/download.html) 以支持音频
 
   ```sh
-  # for mac
+  # 对于 mac
   brew install portaudio
   brew install ffmpeg
   ```
 
   ```sh
-  # for ubuntu
+  # 对于 ubuntu
   sudo apt update
   sudo apt install portaudio19-dev
   sudo apt install ffmpeg
   ```
 
-  Note:
+  注意：
 
-  - `ffmpeg>=4.4` is needed to work with `torchaudio>=2.1.0`
+  - `ffmpeg>=4.4` 需要与 `torchaudio>=2.1.0` 一起使用
 
-  - Mac users may need to add ffmpeg library path to `DYLD_LIBRARY_PATH` for torchaudio to work:
+  - mac 用户可能需要将 ffmpeg 库路径添加到 `DYLD_LIBRARY_PATH` 以使 torchaudio 正常工作：
     ```sh
     export DYLD_LIBRARY_PATH=/opt/homebrew/lib:$DYLD_LIBRARY_PATH
     ```
 
-  Then install all python requirements
+  然后安装所有 Python 依赖
+
+  ```
+  conda create --name realchar python=3.11
+  conda activate realchar
+  ```
 
   ```sh
   pip install -r requirements.txt
   ```
 
-  If you need a faster local speech to text, install whisperX
+  如果需要更快的本地语音转文本，安装 whisperX
 
   ```sh
   pip install git+https://github.com/m-bain/whisperx.git
   ```
 
-- **Step 3**. Create an empty [sqlite](https://www.sqlite.org/index.html) database if you have not done so before
+- **步骤 3**. 如果以前没有创建过 SQLite 数据库，请创建一个空数据库
   ```sh
   sqlite3 test.db "VACUUM;"
   ```
-- **Step 4**. Run db upgrade
+- **步骤 4**. 运行数据库升级
   ```sh
   alembic upgrade head
   ```
-  This ensures your database schema is up to date. Please run this after every time you pull the main branch.
-- **Step 5**. Setup `.env`:
+  这确保你的数据库模式是最新的。每次从主分支拉取后，请运行此命令。
+- **步骤 5**. 设置 `.env` 文件：
   ```sh
   cp .env.example .env
   ```
-  Update API keys and configs following the instructions in the `.env` file.
-  > Note that some features require a working login system. You can get your own OAuth2 login for free with [Firebase](https://firebase.google.com/) if needed. To enable, set `USE_AUTH` to `true` and fill in the `FIREBASE_CONFIG_PATH` field. Also fill in Firebase configs in `client/next-web/.env`.
-- **Step 6**. Run backend server with `cli.py` or use uvicorn directly
+  按照 `.env` 文件中的说明更新 API 密钥和配置。
+  > 注意，某些功能需要工作中的登录系统。如果需要，你可以通过 [Firebase](https://firebase.google.com/) 免费获取自己的 OAuth2 登录。要启用，请将 `USE_AUTH` 设置为 `true` 并填写 `FIREBASE_CONFIG_PATH` 字段。还需填写 Firebase 配置到 `client/next-web/.env` 文件中。
+- **步骤 6**. 使用 `cli.py` 启动后台服务器，或直接使用 uvicorn
   ```sh
   python cli.py run-uvicorn
-  # or
+  # 或
   uvicorn characters.main:app
   ```
-- **Step 7**. Run frontend client:
+- **步骤 7**. 启动前端客户端：
 
-  - web client:
+  - 网页客户端：
 
-    Create an `.env` file under `client/next-web/`
+    在 `client/next-web/` 目录下创建 `.env` 文件
 
     ```sh
     cp client/next-web/.env.example client/next-web/.env
     ```
 
-    Adjust `.env` according to the instruction in `client/next-web/README.md`.
+    根据 `client/next-web/README.md` 中的说明调整 `.env` 文件。
 
-    Start the frontend server:
+    启动前端服务器：
 
     ```sh
     python cli.py next-web-dev
-    # or
+    # 或
     cd client/next-web && npm run dev
-    # or
+    # 或
     cd client/next-web && npm run build && npm run start
     ```
 
-    After running these commands, a local development server will start, and your default web browser will open a new tab/window pointing to this server (usually http://localhost:3000).
+    执行这些命令后，本地开发服务器将启动，默认网页浏览器将打开一个新的标签页/窗口指向该服务器（通常是 http://localhost:3000）。
 
-  - (Optional) Terminal client:
+  - （可选）终端客户端：
 
-    Run the following command in your terminal
+    在终端中运行以下命令
 
     ```sh
     python client/cli.py
     ```
 
-  - (Optional) mobile client:
+  - （可选）移动客户端：
 
-    open `client/mobile/ios/rac/rac.xcodeproj/project.pbxproj` in Xcode and run the app
+    在 Xcode 中打开 `client/mobile/ios/rac/rac.xcodeproj/project.pbxproj` 并运行应用
 
-- **Step 8**. Select one character to talk to, then start talking. Use **GPT4** for better conversation and **Wear headphone** for best audio(avoid echo)
+- **步骤 8**. 选择一个角色开始对话。使用 **GPT4** 以获得更好的对话体验，并 **佩戴耳机** 以获得最佳音频效果（避免回音）
 
-Note if you want to remotely connect to a FunnyChar server, SSL set up is required to establish the audio connection.
+如果你想远程连接到 FunnyChar 服务器，需要设置 SSL 以建立音频连接。
 
-## 👨‍🚀 API Keys and Configurations
+## 👨‍🚀 API 密钥和配置
 
 ### 1. LLMs
 
-### 1.1 ReByte API Key
+步骤如下：
 
-To get your ReByte API key, follow these steps:
+1. 访问 [OpenAI 的平台](https://platform.openai.com/) 并注册一个账户（如果尚未注册）。
+2. 登录后，进入设置 > API 密钥。
+3. 通过点击“创建新密钥”按钮生成新的 API 密钥。
+4. 将密钥复制到 `.env` 文件的 `OPENAI_API_KEY` 变量中。
 
-1. Go to the [ReByte website](https://rebyte.ai/) and sign up for an account if you haven't already.
-1. Once you're logged in, go to Settings > API Keys.
-1. Generate a new API key by clicking on the "Generate" button.
-
-### 1.2 (Optional) OpenAI API Token
-
-<details><summary>👇click me</summary>
-This application utilizes the OpenAI API to access its powerful language model capabilities. In order to use the OpenAI API, you will need to obtain an API token.
-
-To get your OpenAI API token, follow these steps:
-
-1. Go to the [OpenAI website](https://beta.openai.com/signup/) and sign up for an account if you haven't already.
-1. Once you're logged in, navigate to the [API keys page](https://beta.openai.com/account/api-keys).
-1. Generate a new API key by clicking on the "Create API Key" button.
-
-(Optional) To use Azure OpenAI API instead, refer to the following section:
-
-1. Set API type in your `.env` file:
-   `OPENAI_API_TYPE=azure`
-
-If you want to use the earlier version `2023-03-15-preview`:
-
-`OPENAI_API_VERSION=2023-03-15-preview`
-
-2. To set the base URL for your Azure OpenAI resource.
-   You can find this in the Azure portal under your Azure OpenAI resource.
-
-`OPENAI_API_BASE=https://your-base-url.openai.azure.com`
-
-3. To set the OpenAI model deployment name for your Azure OpenAI resource.
-
-`OPENAI_API_MODEL_DEPLOYMENT_NAME=gpt-35-turbo-16k`
-
-4. To set the OpenAIEmbeddings model deployment name for your Azure OpenAI resource.
-
-`OPENAI_API_EMBEDDING_DEPLOYMENT_NAME=text-embedding-ada-002`
-
+有关 OpenAI API 的更多信息，请参见其 [API 文档](https://platform.openai.com/docs/guides/gpt)。
 </details>
 
-### 1.3 (Optional) Anthropic(Claude 2) API Token
+### 2. 语音
 
-<details><summary>👇click me</summary>
+### 2.1 Google Speech to Text API 密钥
 
-To get your Anthropic API token, follow these steps:
+获取你的 Google Cloud Speech-to-Text API 密钥，请按照以下步骤：
 
-1. Go to the [Anthropic website](https://docs.anthropic.com/claude/docs/getting-started-with-claude) and sign up for an account if you haven't already.
-1. Once you're logged in, navigate to the [API keys page](https://console.anthropic.com/account/keys).
-1. Generate a new API key by clicking on the "Create Key" button.
-</details>
+1. 访问 [Google Cloud Console](https://console.cloud.google.com/) 并注册一个账户（如果尚未注册）。
+2. 创建一个新项目。
+3. 在“API 和服务”中启用 “Speech-to-Text” API。
+4. 生成服务账户密钥并下载 JSON 文件。
+5. 将 JSON 文件路径复制到 `.env` 文件中的 `GOOGLE_APPLICATION_CREDENTIALS` 变量中。
 
-### 1.4 (Optional) Anyscale API Token
+有关 Google Speech-to-Text 的更多信息，请参见其 [API 文档](https://cloud.google.com/speech-to-text/docs/overview) 。
 
-<details><summary>👇click me</summary>
+### 2.2 ElevenLabs API 密钥
 
-To get your Anyscale API token, follow these steps:
+获取你的 ElevenLabs API 密钥，请按照以下步骤：
 
-1. Go to the [Anyscale website](https://www.anyscale.com/) and sign up for an account if you haven't already.
-1. Once you're logged in, navigate to the [Credentials page](https://app.endpoints.anyscale.com/credentials).
-1. Generate a new API key by clicking on the "Generate credential" button.
-</details>
+1. 访问 [ElevenLabs 网站](https://beta.elevenlabs.io/) 并注册一个账户（如果尚未注册）。
+2. 登录后，进入设置 > API 密钥。
+3. 生成新的 API 密钥。
+4. 将密钥复制到 `.env` 文件中的 `ELEVEN_API_KEY` 变量中。
 
-### 2. Speech to Text
+有关 ElevenLabs API 的更多信息，请参见其 [API 文档](https://docs.elevenlabs.io/)。
 
-We support [faster-whisper](https://github.com/SYSTRAN/faster-whisper) and [whisperX](https://github.com/m-bain/whisperX) as the local speech to text engines. Work with CPU and NVIDIA GPU.
+### 3. Firebase 密钥
 
-### 2.1 (Optional) Google Speech-to-Text API
+获取你的 Firebase 配置文件：
 
-<details><summary>👇click me</summary>
+1. 访问 [Firebase 控制台](https://console.firebase.google.com/) 并创建一个新的 Firebase 项目。
+2. 在项目设置中，找到 Firebase 配置文件的下载链接。
+3. 将下载的配置文件路径复制到 `.env` 文件中的 `FIREBASE_CONFIG_PATH` 变量中。
 
-To get your Google Cloud API credentials.json, follow these steps:
+有关 Firebase 的更多信息，请参见其 [文档](https://firebase.google.com/docs/web/setup)。
 
-1. Go to the [GCP website](https://cloud.google.com/speech-to-text/docs/before-you-begin) and sign up for an account if you haven't already.
-2. Follow the guide to create a project and enable Speech to Text API
-3. Put `google_credentials.json` in the root folder of this project. Check [Create and delete service account keys](https://cloud.google.com/iam/docs/keys-create-delete#iam-service-account-keys-create-console)
-4. Change `SPEECH_TO_TEXT_USE` to use `GOOGLE` in your `.env` file
-</details>
+## 👩‍💻 贡献
 
-### 2.2 (Optional) OpenAI Whisper API
+1. **Fork** 该仓库并 **克隆** 到本地
+2. **创建新的分支** 并进行更改
+3. 提交更改并 **推送** 到 GitHub
+4. 提交 **Pull Request** 来审查更改
 
-<details><summary>👇click me</summary>
+## 📜 许可
 
-Same as [OpenAI API Token](#12-optional-openai-api-token)
-
-</details>
-
-### 3. Text to Speech
-
-Edge TTS is the default and is free to use.
-
-### 3.1 (Optional) ElevenLabs API Key
-
-<details><summary>👇click me</summary>
-
-1. Creating an ElevenLabs Account
-
-   Visit [ElevenLabs](https://beta.elevenlabs.io/) to create an account. You'll need this to access the text to speech and voice cloning features.
-
-1. In your Profile Setting, you can get an API Key.
-
-</details>
-
-### 3.2 (Optional) Google Text-to-Speech API
-
-<details><summary>👇click me</summary>
-
-To get your Google Cloud API credentials.json, follow these steps:
-
-1. Go to the [GCP website](https://cloud.google.com/text-to-speech/docs/quickstart-client-libraries) and sign up for an account if you haven't already.
-2. Follow the guide to create a project and enable Text to Speech API
-3. Put `google_credentials.json` in the root folder of this project. Check [Create and delete service account keys](https://cloud.google.com/iam/docs/keys-create-delete#iam-service-account-keys-create-console)
-</details>
-
-## (Optional) 🔥 Create Your Own Characters
-
-<details><summary>👇click me</summary>
-
-### Create Characters Locally
-
-see [characters/character_catalog/README.md](characters/character_catalog/README.md)
-
-### Create Characters on ReByte.ai
-
-see [docs/rebyte_agent_clone_instructions.md](docs/rebyte_agent_clone_instructions.md)
-
-</details>
-
-## (Optional) ☎️ Twilio Integration
-
-<details><summary>👇click me</summary>
-
-To use [Twilio](https://www.twilio.com/en-us) with FunnyChar, you need to set up a Twilio account. Then, fill in the following environment variables in your `.env` file:
-
-```sh
-TWILIO_ACCOUNT_SID=YOUR_TWILIO_ACCOUNT_SID
-TWILIO_ACCESS_TOKEN=YOUR_TWILIO_ACCESS_TOKEN
-DEFAULT_CALLOUT_NUMBER=YOUR_PHONE_NUMBER
-```
-
-You'll also need to install `torch` and `torchaudio` to use Twilio.
-
-Now, you can receive phone calls from your characters by typing `/call YOURNUMBER` in the text box when chatting with your character.
-
-Note: only US phone numbers and Elevenlabs voiced characters are supported at the moment.
-
-</details>
-
-## 🆕! Anyscale and LangSmith integration
-
-<details><summary>👇click me</summary>
-
-### Anyscale
-
-You can now use [Anyscale Endpoint](https://app.endpoints.anyscale.com/landing) to serve Llama-2 models in your FunnyChar easily! Simply register an account with Anyscale Endpoint. Once you get the API key, set this environment variable in your `.env` file:
-
-```
-ANYSCALE_ENDPOINT_API_KEY=<your API Key>
-```
-
-By default, we show the largest servable Llama-2 model (70B) in the Web UI. You can change the model name (`meta-llama/Llama-2-70b-chat-hf`) to other models, e.g. 13b or 7b versions.
-
-### LangSmith
-
-If you have access to LangSmith, you can edit these environment variables to enable:
-
-```
-LANGCHAIN_TRACING_V2=false # default off
-LANGCHAIN_ENDPOINT=https://api.smith.langchain.com
-LANGCHAIN_API_KEY=YOUR_LANGCHAIN_API_KEY
-LANGCHAIN_PROJECT=YOUR_LANGCHAIN_PROJECT
-```
-
-And it should work out of the box.
-
-</details>
-
-<br/>
-
-## 📍 Roadmap
-
-- [x] Launch v0.0.4
-- [x] Create a new character via web UI
-- [x] Lower conversation latency
-- [x] Support Twilio
-- [x] Support ReByte
-- [x] Persistent conversation\*
-- [ ] Session management\*
-- [ ] Support RAG\*
-- [ ] Support Agents/GPTs\*
-- [ ] Add additional TTS service\*
-
-$*$ These features are powered by [ReByte](https://rebyte.ai/) platform.
-
-## 🫶 Contribute to FunnyChar
-
-Please check out our [Contribution Guide](contribute.md)!
-
-## 💪 Contributors
-
-<a href="https://github.com/Shaunwei/FunnyChar">
-  <img src="https://contrib.rocks/image?repo=Shaunwei/FunnyChar" />
-</a>
-
-## 🎲 Community
-
-- Join us on [Discord](https://funnychar.ai/join-discord)
+FunnyChar 遵循 MIT 许可证。有关详细信息，请参见 `LICENSE` 文件。
