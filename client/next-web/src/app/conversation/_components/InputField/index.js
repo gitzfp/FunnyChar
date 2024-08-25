@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { Button } from '@nextui-org/button';
-// import InputEmoji from 'react-input-emoji';
+import { Button} from '@nextui-org/button'; 
+import { Input } from '@nextui-org/input'
 import { IoIosSend } from 'react-icons/io';
 import ClickToTalk from './ClickToTalk';
 
@@ -17,7 +17,6 @@ export default function InputField() {
       stopAudioPlayback();
       appendUserChat(text);
       if (text.startsWith('/')) {
-        // command
         const args = handleCommand(text);
         switch (args[0]) {
           case 'call':
@@ -38,7 +37,6 @@ export default function InputField() {
               break;
             }
             const vad_threshold = 0.8;
-            // call endpoint
             callOutgoing(number, vad_threshold);
             break;
           default:
@@ -55,33 +53,35 @@ export default function InputField() {
   }
 
   const renderBottomButtons = () => {
-    return <><div>
-            {/* <InputEmoji
-              value={text}
-              onChange={setText}
-              cleanOnEnter
-              onEnter={handleOnEnter}
-              placeholder='Your turn'
-              fontSize={16}
-              fontFamily=''
-            /> */}
+    return (
+      <>
+        <div>
+          <Input 
+            value={text} 
+            onChange={(e) => setText(e.target.value)} 
+            onKeyPress={(e) => e.key === 'Enter' && handleOnEnter()}
+            placeholder="Type your message here..."
+            clearable
+          />
+        </div>
+        <div className='flex flex-row justify-between items-center'>
+          <div className='pl-2 flex flex-row gap-1'>
+            <ClickToTalk className='' />
           </div>
-          <div className='flex flex-row justify-between items-center'>
-            <div className='pl-2 flex flex-row gap-1'>
-              <ClickToTalk className='' />
-            </div>
-            <div className='mr-4 h-10'>
-              <Button
-                aria-label='send'
-                size='md'
-                isDisabled={text === ''}
-                className='bg-real-blue-500 px-2 min-w-fit sm:min-w-16 sm:px-4 md:flex h-9 disabled:bg-transparent'
-                onPress={handleOnEnter}
-              >
-                <IoIosSend size='2em' />
-              </Button>
-            </div>
-        </div></>
+          <div className='mr-4 h-10'>
+            <Button
+              aria-label='send'
+              size='md'
+              isDisabled={text === ''}
+              className='bg-real-blue-500 px-2 min-w-fit sm:min-w-16 sm:px-4 md:flex h-9 disabled:bg-transparent'
+              onPress={handleOnEnter}
+            >
+              <IoIosSend size='2em' />
+            </Button>
+          </div>
+        </div>
+      </>
+    );
   }
 
   return (
