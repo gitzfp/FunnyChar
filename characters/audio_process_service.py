@@ -46,6 +46,9 @@ class AudioProcessService:
 
     async def process_audio(self, binary_data, platform, character, message_id, websocket, manager):
         try:
+            logging.info(
+                f"=====process_audio1:Message sent to client"
+            )
             # 并发执行上传和转录任务
             transcript, audio_url = await asyncio.gather(
                 asyncio.to_thread(
@@ -59,7 +62,9 @@ class AudioProcessService:
                     binary_data,
                 )
             )
-
+            logging.info(
+                f"=====process_audio2:Message sent to client: text = {transcript}, "
+            )
             # 去除转录文本的两端空白字符
             transcript = transcript.strip()
 
@@ -71,7 +76,7 @@ class AudioProcessService:
                 websocket=websocket,
             )
             logging.info(
-                f"Message sent to client: text = {transcript}, "
+                f"=====process_audio3:Message sent to client: text = {transcript}, "
                 f"audioUrl = {audio_url}, messageId = {message_id}"
             )
 

@@ -229,31 +229,45 @@ async def upload_audio_to_gcs(audio_bytes: bytes, filename_prefix: str = "audio/
     返回值:
     - 存储在 GCS 中的文件的完整路径.
     """
-    # 初始化 Google Cloud Storage 客户端
-    storage_client = storage.Client()
+    try:
+        logger.debug("Initializing Google Cloud Storage client")
+        storage_client = storage.Client()
 
-    # 获取存储桶名称
-    bucket_name = os.environ.get("GCP_STORAGE_BUCKET_NAME")
-    if not bucket_name:
+        logger.debug("Fetching GCP_STORAGE_BUCKET_NAME environment variable")
+        bucket_name = os.environ.get("GCP_STORAGE_BUCKET_NAME")
+        if not bucket_name:
+            logger.error("GCP_STORAGE_BUCKET_NAME is not set")
+            raise HTTPException(
+                status_code=http_status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail="GCP_STORAGE_BUCKET_NAME is not set",
+            )
+
+        logger.debug(f"Accessing bucket: {bucket_name}")
+        bucket = storage_client.bucket(bucket_name)
+
+        # 创建唯一的文件名
+        new_filename = (
+            f"{filename_prefix}"
+            f"{datetime.datetime.now().strftime('%Y%m%d-%H%M%S')}-"
+            f"{uuid.uuid4()}.wav"
+        )
+        logger.debug(f"Generated new filename: {new_filename}")
+
+        # 创建一个 GCS blob 对象
+        logger.debug("Creating blob object")
+        blob = bucket.blob(new_filename)
+
+        # 上传音频文件到 GCS
+        logger.debug("Uploading audio file to GCS")
+        await asyncio.to_thread(blob.upload_from_string, audio_bytes)
+
+        # 返回文件的完整路径
+        gcs_path = f"https://storage.googleapis.com/{bucket_name}/{new_filename}"
+        logger.debug(f"File uploaded successfully to: {gcs_path}")
+        return gcs_path
+
+    except Exception as e:
+        logger.error(f"Failed to upload audio to GCS: {e}")
         raise HTTPException(
             status_code=http_status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="GCP_STORAGE_BUCKET_NAME is not set",
-        )
-
-    bucket = storage_client.bucket(bucket_name)
-
-    # 创建唯一的文件名
-    new_filename = (
-        f"{filename_prefix}"
-        f"{datetime.datetime.now().strftime('%Y%m%d-%H%M%S')}-"
-        f"{uuid.uuid4()}.wav"  # 假设上传的音频文件是 wav 格式
-    )
-
-    # 创建一个 GCS blob 对象
-    blob = bucket.blob(new_filename)
-
-    # 上传音频文件到 GCS
-    await asyncio.to_thread(blob.upload_from_string, audio_bytes)
-
-    # 返回文件的完整路径
-    return f"https://storage.googleapis.com/{bucket_name}/{new_filename}"
+            detail=f"Failed to upload audio to GCS: {str(e)}",)
