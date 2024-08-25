@@ -7,7 +7,7 @@ import requests
 from io import BytesIO
 from characters.audio.speech_to_text import get_speech_to_text
 from characters.logger import get_logger
-from characters.utils import upload_audio_to_gcs
+from characters.utils import upload_audio_to_oss
 from pydub import AudioSegment
 
 
@@ -58,9 +58,7 @@ class AudioProcessService:
                     prompt=character.name,
                     language=None,
                 ),  # 去除转录文本首尾的空白字符,
-                upload_audio_to_gcs(
-                    binary_data,
-                )
+                upload_audio_to_oss(binary_data)
             )
             logging.info(
                 f"=====process_audio2:Message sent to client: text = {transcript}, "

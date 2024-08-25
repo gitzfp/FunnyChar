@@ -15,6 +15,7 @@ from characters.models.interaction import Interaction
 from characters.logger import get_logger
 from google.cloud import storage
 from fastapi import HTTPException, status as http_status
+import oss2
 
 
 logger = get_logger(__name__)
@@ -271,3 +272,51 @@ async def upload_audio_to_gcs(audio_bytes: bytes, filename_prefix: str = "audio/
         raise HTTPException(
             status_code=http_status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to upload audio to GCS: {str(e)}",)
+
+
+async def upload_audio_to_oss(audio_bytes: bytes, filename_prefix: str = "audio/") -> str:
+    """
+    上传音频文件到阿里云OSS.
+
+    参数:
+    - audio_bytes: 需要上传的音频文件数据.
+    - filename_prefix: 存储在OSS中的文件名前缀.
+
+    返回值:
+    - 存储在OSS中的文件的完整路径.
+    """
+    try:
+        logger.debug("Initializing OSS client")
+
+        access_key_id = os.getenv('ALIYUN_ACCESS_KEY_ID')
+        access_key_secret = os.getenv(
+            'ALIYUN_ACCESS_KEY_SECRET', 'xxcNZWIAQmUqeoW1TaIekQz9WGyOsW')
+        bucket_name = os.getenv('ALIYUN_BUCKET_NAME')
+        endpoint = os.getenv('ALIYUN_OSS_ENDPOINT')
+
+        if not all([access_key_id, access_key_secret, bucket_name, endpoint]):
+            logger.error("One or more environment variables are missing")
+            raise ValueError(
+                "Missing environment variables for OSS configuration")
+
+        auth = oss2.Auth(access_key_id, access_key_secret)
+        bucket = oss2.Bucket(auth, endpoint, bucket_name)
+
+        new_filename = (
+            f"{filename_prefix}"
+            f"{datetime.datetime.now().strftime('%Y%m%d-%H%M%S')}-"
+            f"{uuid.uuid4()}.wav"
+        )
+        logger.debug(f"Generated new filename: {new_filename}")
+
+        # 上传音频文件到OSS
+        logger.debug("Uploading audio file to OSS")
+        bucket.put_object(new_filename, audio_bytes)
+
+        oss_path = f"https://{bucket_name}.{endpoint}/{new_filename}"
+        logger.debug(f"File uploaded successfully to: {oss_path}")
+        return oss_path
+
+    except Exception as e:
+        logger.error(f"Failed to upload audio to OSS: {e}")
+        raise
