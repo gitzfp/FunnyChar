@@ -490,7 +490,7 @@ async def get_recent_conversations(user=Depends(get_current_user), db: Session =
     stmt = (
         db.query(
             Interaction.session_id,
-            Interaction.client_message_unicode,
+            Interaction.client_message,
             Interaction.timestamp,
             func.row_number()
             .over(partition_by=Interaction.session_id, order_by=Interaction.timestamp.desc())
@@ -501,7 +501,7 @@ async def get_recent_conversations(user=Depends(get_current_user), db: Session =
     )
 
     results = await asyncio.to_thread(
-        db.query(stmt.c.session_id, stmt.c.client_message_unicode)
+        db.query(stmt.c.session_id, stmt.c.client_message)
         .filter(stmt.c.rn == 1)
         .order_by(stmt.c.timestamp.desc())
         .all
@@ -509,7 +509,7 @@ async def get_recent_conversations(user=Depends(get_current_user), db: Session =
 
     # Format the results to the desired output
     return [
-        {"session_id": r[0], "client_message_unicode": r[1], "timestamp": r[2]} for r in results
+        {"session_id": r[0], "client_message": r[1], "timestamp": r[2]} for r in results
     ]
 
 

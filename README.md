@@ -102,19 +102,39 @@
   pip install git+https://github.com/m-bain/whisperx.git
   ```
 
-- **步骤 3**. 如果以前没有创建过 SQLite 数据库，请创建一个空数据库
+- **步骤 3**. 如果以前没有安装过 Mysql 数据库，请先安装
+  #### 对于 Ubuntu/Debian：
   ```sh
-  sqlite3 test.db "VACUUM;"
+  sudo apt update
+  sudo apt install mysql-server
   ```
+  #### 对于 macOS (使用 Homebrew)：
+  ```sh
+  brew update
+  brew install mysql
+  ```
+
+  #### 启动 MySQL 服务（每个系统启动命令不一样，下面以Linux举例）
+  ```sh
+  sudo systemctl start mysql
+  ```
+  #### 登录 MySQL，创建 funnychar数据库
+  ```sh
+  mysql -u root -p
+  create database funny_chat;
+  ```
+
 - **步骤 4**. 运行数据库升级
   ```sh
   alembic upgrade head
   ```
   这确保你的数据库模式是最新的。每次从主分支拉取后，请运行此命令。
+  
 - **步骤 5**. 设置 `.env` 文件：
   ```sh
   cp .env.example .env
   ```
+
   按照 `.env` 文件中的说明更新 API 密钥和配置。
   > 注意，某些功能需要工作中的登录系统。如果需要，你可以通过 [Firebase](https://firebase.google.com/) 免费获取自己的 OAuth2 登录。要启用，请将 `USE_AUTH` 设置为 `true` 并填写 `FIREBASE_CONFIG_PATH` 字段。还需填写 Firebase 配置到 `client/next-web/.env` 文件中。
 - **步骤 6**. 使用 `cli.py` 启动后台服务器，或直接使用 uvicorn

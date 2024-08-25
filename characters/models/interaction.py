@@ -13,12 +13,9 @@ class Interaction(Base):
     client_id = Column(Integer)  # deprecated, use user_id instead
     user_id = Column(String(50))
     session_id = Column(String(50))
-    # deprecated, use client_message_unicode instead
-    client_message = Column(String)
-    # deprecated, use server_message_unicode instead
-    server_message = Column(String)
-    client_message_unicode = Column(Unicode(65535))
-    server_message_unicode = Column(Unicode(65535))
+
+    client_message = Column(String(1000))
+    server_message = Column(String(1000))
 
     timestamp = Column(DateTime, default=datetime.datetime.utcnow)
     platform = Column(String(50))

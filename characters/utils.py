@@ -54,8 +54,8 @@ class ConversationHistory:
             Interaction.session_id == session_id).all()
         for conversation in conversations:
             # type: ignore
-            self.user.append(conversation.client_message_unicode)
-            self.ai.append(conversation.server_message_unicode)  # type: ignore
+            self.user.append(conversation.client_message)
+            self.ai.append(conversation.server_message)  # type: ignore
 
 
 def build_history(conversation_history: ConversationHistory) -> list[BaseMessage]:

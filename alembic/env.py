@@ -13,8 +13,7 @@ from characters.models.character import Character
 from characters.models.feedback import Feedback
 from characters.models.interaction import Interaction
 from characters.models.memory import Memory
-from characters.models.quivr_info import QuivrInfo
-from characters.models.user import User  
+from characters.models.user import User
 
 
 load_dotenv()

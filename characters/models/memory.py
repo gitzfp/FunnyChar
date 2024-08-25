@@ -4,7 +4,7 @@ from typing import Optional
 
 from pgvector.sqlalchemy import Vector
 from pydantic import BaseModel
-from sqlalchemy import Column, DateTime, String, Unicode
+from sqlalchemy import Column, DateTime, String, Text, Unicode
 from sqlalchemy.inspection import inspect
 
 from characters.database.base import Base
@@ -16,7 +16,7 @@ class Memory(Base):
     memory_id = Column(String(64), primary_key=True)
     user_id = Column(String(50), nullable=True)
     source_session_id = Column(String(50), nullable=True)
-    content = Column(Unicode(65535), nullable=True)
+    content = Column(Text, nullable=True)
     created_at = Column(DateTime(), nullable=False)
     updated_at = Column(DateTime(), nullable=False)
     if "postgres" in os.environ.get("DATABASE_URL", ""):

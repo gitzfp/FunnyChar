@@ -2,7 +2,7 @@ import datetime
 from typing import Optional
 
 from pydantic import BaseModel
-from sqlalchemy import Column, DateTime, Integer, JSON, String
+from sqlalchemy import Column, DateTime, Integer, JSON, String, Text
 from sqlalchemy.inspection import inspect
 
 from characters.database.base import Base
@@ -11,10 +11,10 @@ from characters.database.base import Base
 class Character(Base):
     __tablename__ = "characters"
 
-    id = Column(String(), primary_key=True, index=True, nullable=False)
+    id = Column(String(100), primary_key=True)
     name = Column(String(1024), nullable=False)
-    system_prompt = Column(String(262144), nullable=True)
-    user_prompt = Column(String(262144), nullable=True)
+    system_prompt = Column(Text, nullable=True)
+    user_prompt = Column(Text, nullable=True)
     text_to_speech_use = Column(String(100), nullable=True)
     voice_id = Column(String(100), nullable=True)
     author_id = Column(String(100), nullable=True)
@@ -24,7 +24,7 @@ class Character(Base):
     updated_at = Column(DateTime(), nullable=False)
     tts = Column(String(64), nullable=True)
     avatar_id = Column(String(100), nullable=True)
-    background_text = Column(String(262144), nullable=True)
+    background_text = Column(Text, nullable=True)
 
     def to_dict(self):
         return {

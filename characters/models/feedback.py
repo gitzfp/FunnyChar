@@ -2,7 +2,7 @@ import datetime
 from typing import Optional
 
 from pydantic import BaseModel
-from sqlalchemy import Column, DateTime, String, Unicode
+from sqlalchemy import Column, DateTime, String, Text, Unicode
 from sqlalchemy.inspection import inspect
 
 from characters.database.base import Base
@@ -14,9 +14,9 @@ class Feedback(Base):
     message_id = Column(String(64), primary_key=True)
     session_id = Column(String(50), nullable=True)
     user_id = Column(String(50), nullable=True)
-    server_message_unicode = Column(Unicode(65535), nullable=True)
+    server_message_unicode = Column(Text, nullable=True)
     feedback = Column(String(100), nullable=True)
-    comment = Column(Unicode(65535), nullable=True)
+    comment = Column(Text, nullable=True)
     created_at = Column(DateTime(), nullable=False)
 
     def to_dict(self):

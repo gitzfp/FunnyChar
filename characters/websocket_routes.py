@@ -365,8 +365,8 @@ async def handle_receive(
                     interaction = Interaction(
                         user_id=user_id,
                         session_id=session_id,
-                        client_message_unicode=msg_data,
-                        server_message_unicode=response,
+                        client_message=msg_data,
+                        server_message=response,
                         platform=platform,
                         action_type="text",
                         character_id=character_id,
@@ -506,8 +506,8 @@ async def handle_receive(
                 interaction = Interaction(
                     user_id=user_id,
                     session_id=session_id,
-                    client_message_unicode=transcript,
-                    server_message_unicode="",
+                    client_message=transcript,
+                    server_message="",
                     platform=platform,
                     action_type="audio",
                     character_id=character_id,
@@ -548,8 +548,8 @@ async def handle_receive(
                         interaction = Interaction(
                             user_id=user_id,
                             session_id=session_id,
-                            client_message_unicode=transcript,
-                            server_message_unicode=response,
+                            client_message=transcript,
+                            server_message=response,
                             platform=platform,
                             action_type="audio",
                             character_id=character_id,
