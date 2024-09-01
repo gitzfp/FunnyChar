@@ -68,8 +68,6 @@ class Whisper(Singleton, SpeechToText):
         logger.info("Transcribing audio...")
         if platform == "web":
             audio = self._convert_webm_to_wav(audio_bytes, self.use == "local")
-        elif platform == "twilio":
-            audio = self._ulaw_to_wav(audio_bytes, self.use == "local")
         else:
             audio = self._convert_bytes_to_wav(
                 audio_bytes, self.use == "local")

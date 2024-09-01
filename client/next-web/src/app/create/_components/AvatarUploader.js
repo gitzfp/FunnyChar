@@ -17,7 +17,7 @@ export default function AvatarUploader() {
         onPress={handleClick}
         className="bg-real-contrastBlue"
       >
-        Upload avatar
+        上传头像 
       </Button>
       <input
         ref={uploaderRef}

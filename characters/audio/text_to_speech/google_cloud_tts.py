@@ -83,12 +83,6 @@ class GoogleCloudTTS(Singleton, TextToSpeech):
             **config.data,
         }
 
-        # twilio expects g711 mulaw audio encoding
-        # https://www.twilio.com/docs/voice/twiml/stream#websocket-messages-to-twilio
-        if platform == "twilio":
-            data["audioConfig"]["audioEncoding"] = "MULAW"
-            data["audioConfig"]["sampleRateHertz"] = 8000
-
         url = config.url
         async with httpx.AsyncClient() as client:
             response = await client.post(url, json=data, headers=headers)
@@ -145,7 +139,8 @@ class GoogleCloudTTS(Singleton, TextToSpeech):
         async with httpx.AsyncClient() as client:
             response = await client.post(url, json=data, headers=headers)
             if response.status_code != 200:
-                raise Exception(f"Google Cloud TTS returns response {response.status_code}")
+                raise Exception(
+                    f"Google Cloud TTS returns response {response.status_code}")
             else:
                 audio_content = response.content
                 # Decode the base64-encoded audio content

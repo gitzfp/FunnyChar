@@ -8,10 +8,8 @@ import { useAuth, useUser } from '@clerk/nextjs';
 
 export default function Header() {
   const { getToken } = useAuth();
-  const { isSignedIn, user, isLoaded } = useUser();
+  const { user} = useUser();
   const { token, setToken } = useAppStore();
-
-  console.log(user, "用户>>>>>>>信息", isSignedIn, isLoaded, token);
 
   useEffect(() => {
     const getUserToken = async () => {

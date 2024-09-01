@@ -39,10 +39,13 @@ const constructForm = async (get) => {
   if (get().avatarFile) {
     try {
       let res = await uploadFile(get().avatarFile, get().token);
+      if (!res || !res.filename) {
+        throw new Error('Failed to upload avatar file');
+      }
       new_formData.data.avatar_filename = res.filename;
     } catch (error) {
-      console.error(error);
-      alert('Error uploading image');
+      console.error('Error uploading avatar:', error);
+      throw new Error('Failed to upload avatar: ' + error.message);
     }
   }
   // upload background files to gcs
@@ -343,10 +346,11 @@ export const createCharacterSlice = (set, get) => ({
     });
   },
   submitForm: async () => {
-    let new_formData = await constructForm(get);
-    // call api to create character
-    console.log(new_formData);
+
     try {
+      let new_formData = await constructForm(get);
+      // call api to create character
+      console.log(new_formData);
       await createCharacter(new_formData, get().token);
     } catch (error) {
       console.error(error);

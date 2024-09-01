@@ -6,7 +6,6 @@ export const createSettingSlice = (set, get) => ({
   selectedModel: new Set(['gpt-4o-mini']),
   isMute: false,
   disableMic: false,
-  isJournalMode: false,
   languageList: [
     'Auto Detect',
     'English',
@@ -76,11 +75,5 @@ export const createSettingSlice = (set, get) => ({
   },
   setDisableMic: (v) => {
     set({ disableMic: v });
-  },
-  setIsJournalMode: (v) => {
-    set({ isJournalMode: v });
-    if (get().socketIsOpen) {
-      get().sendOverSocket('[!JOURNAL_MODE]' + v);
-    }
   },
 });

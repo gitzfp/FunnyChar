@@ -1,5 +1,5 @@
 import { motion, useCycle, AnimatePresence } from 'framer-motion';
-import { Button, Select, SelectItem, SelectSection, Switch } from '@nextui-org/react';
+import { Button, Select, SelectItem, SelectSection} from '@nextui-org/react';
 import { RxHamburgerMenu, RxCross2 } from 'react-icons/rx';
 import { BiSolidLockAlt } from 'react-icons/bi';
 import styles from './HamburgerMenu.module.css';
@@ -31,8 +31,6 @@ export default function HamburgerMenu() {
     preferredLanguage,
     languageList,
     handleLanguageChange,
-    isJournalMode,
-    setIsJournalMode,
   } = useAppStore();
   const { user } = useUser();
 
@@ -171,18 +169,6 @@ export default function HamburgerMenu() {
                       ))}
                     </SelectSection>
                   </Select>
-                </section>
-                <section>
-                  <header className='text-sm font-light my-3'>Advanced options</header>
-                  <div className='flex flex-row gap-4 justify-between my-3'>
-                    <p>Journal Mode</p>
-                    <Switch
-                      size='sm'
-                      isSelected={isJournalMode}
-                      onValueChange={setIsJournalMode}
-                      aria-label='journal mode'
-                    />
-                  </div>
                 </section>
               </section>
             </motion.div>

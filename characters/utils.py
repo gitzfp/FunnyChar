@@ -5,6 +5,10 @@ import os
 from time import perf_counter
 from typing import Callable, Optional, TypedDict
 import uuid
+import io
+import wave
+from PIL import Image
+from fastapi import HTTPException
 
 from langchain.schema import AIMessage, BaseMessage, HumanMessage, SystemMessage
 from pydantic.dataclasses import dataclass
@@ -25,7 +29,7 @@ logger = get_logger(__name__)
 class Character:
     character_id: str
     name: str
-    llm_system_prompt: str
+    system_prompt: str
     llm_user_prompt: str
     source: str = ""
     location: str = ""
@@ -274,18 +278,72 @@ async def upload_audio_to_gcs(audio_bytes: bytes, filename_prefix: str = "audio/
             detail=f"Failed to upload audio to GCS: {str(e)}",)
 
 
-async def upload_audio_to_oss(audio_bytes: bytes, filename_prefix: str = "audio/") -> str:
+def check_file_type(file_bytes: bytes) -> tuple[str, str]:
     """
-    上传音频文件到阿里云OSS.
+    检查文件类型，返回文件类型和对应的文件扩展名.
+    """
+    # 检查是否为WAV音频
+    if is_valid_wav(file_bytes):
+        return "audio", ".wav"
+
+    # 检查是否为图片
+    image_type = get_image_type(file_bytes)
+    if image_type:
+        return "image", image_type
+
+    raise HTTPException(
+        status_code=400,
+        detail="The provided file is neither a valid WAV audio nor a supported image file."
+    )
+
+
+def is_valid_wav(file_bytes: bytes) -> bool:
+    try:
+        with io.BytesIO(file_bytes) as file:
+            with wave.open(file, 'rb') as wave_file:
+                # Check basic properties of the WAV file
+                if wave_file.getnchannels() > 0 and wave_file.getsampwidth() > 0 and wave_file.getframerate() > 0:
+                    return True
+        return False
+    except Exception as e:
+        logger.error(f"Failed to check WAV file: {e}")
+        return False
+
+
+def get_image_type(file_bytes: bytes) -> str:
+    try:
+        with Image.open(io.BytesIO(file_bytes)) as img:
+            img_format = img.format.lower()
+            if img_format in ['jpeg', 'jpg', 'png', 'gif', 'bmp', 'webp']:
+                return f".{img_format}"
+    except Exception as e:
+        logger.error(f"Failed to check image file: {e}")
+        return ""
+
+
+async def upload_file_to_oss(file_bytes: bytes, filename_prefix: str = "media/", file_extension=None) -> str:
+    """
+    验证并上传音频或图片文件到阿里云OSS.
 
     参数:
-    - audio_bytes: 需要上传的音频文件数据.
+    - file_bytes: 需要上传的文件数据.
     - filename_prefix: 存储在OSS中的文件名前缀.
 
     返回值:
     - 存储在OSS中的文件的完整路径.
     """
     try:
+        # 检查文件类型
+        if not file_extension:
+            file_type, file_extension = check_file_type(file_bytes)
+            logger.debug(
+                f"File type detected: {file_type}, extension: {file_extension}")
+        else:
+            logger.debug(f"Using provided file extension: {file_extension}")
+
+        logger.debug(
+            f"extension: {file_extension}")
+
         logger.debug("Initializing OSS client")
 
         access_key_id = os.getenv('ALIYUN_ACCESS_KEY_ID')
@@ -294,10 +352,21 @@ async def upload_audio_to_oss(audio_bytes: bytes, filename_prefix: str = "audio/
         bucket_name = os.getenv('ALIYUN_BUCKET_NAME')
         endpoint = os.getenv('ALIYUN_OSS_ENDPOINT')
 
-        if not all([access_key_id, access_key_secret, bucket_name, endpoint]):
-            logger.error("One or more environment variables are missing")
-            raise ValueError(
-                "Missing environment variables for OSS configuration")
+        # 检查环境变量是否都已设置
+        missing_vars = []
+        if not access_key_id:
+            missing_vars.append('ALIYUN_ACCESS_KEY_ID')
+        if not access_key_secret:
+            missing_vars.append('ALIYUN_ACCESS_KEY_SECRET')
+        if not bucket_name:
+            missing_vars.append('ALIYUN_BUCKET_NAME')
+        if not endpoint:
+            missing_vars.append('ALIYUN_OSS_ENDPOINT')
+
+        if missing_vars:
+            error_msg = f"Missing environment variables: {', '.join(missing_vars)}"
+            logger.error(error_msg)
+            raise HTTPException(status_code=500, detail=error_msg)
 
         auth = oss2.Auth(access_key_id, access_key_secret)
         bucket = oss2.Bucket(auth, endpoint, bucket_name)
@@ -305,18 +374,22 @@ async def upload_audio_to_oss(audio_bytes: bytes, filename_prefix: str = "audio/
         new_filename = (
             f"{filename_prefix}"
             f"{datetime.datetime.now().strftime('%Y%m%d-%H%M%S')}-"
-            f"{uuid.uuid4()}.wav"
+            f"{uuid.uuid4()}{file_extension}"
         )
         logger.debug(f"Generated new filename: {new_filename}")
 
-        # 上传音频文件到OSS
-        logger.debug("Uploading audio file to OSS")
-        bucket.put_object(new_filename, audio_bytes)
+        # 上传文件到OSS
+        logger.debug(f"Uploading {file_extension} file to OSS")
+        bucket.put_object(new_filename, file_bytes)
 
         oss_path = f"https://{bucket_name}.{endpoint}/{new_filename}"
         logger.debug(f"File uploaded successfully to: {oss_path}")
         return oss_path
 
+    except HTTPException as he:
+        logger.error(f"Invalid file format: {he.detail}")
+        raise he
     except Exception as e:
-        logger.error(f"Failed to upload audio to OSS: {e}")
-        raise
+        logger.error(f"Failed to upload file to OSS: {e}")
+        raise HTTPException(
+            status_code=500, detail=f"Internal server error during file upload: {str(e)}")

@@ -19,11 +19,16 @@ export const createWebsocketSlice = (set, get) => ({
     if (typeof event.data === 'string') {
       const message = event.data;
       if (message === '[end]\n' || message.match(/\[end=([a-zA-Z0-9]+)]/)) {
-        get().appendChatContent();
         const messageIdMatches = message.match(/\[end=([a-zA-Z0-9]+)]/);
         if (messageIdMatches) {
           const messageId = messageIdMatches[1];
           get().setMessageId(messageId);
+          const params = new URLSearchParams(message.substring(message.indexOf('?')));
+          const text = params.get('text');
+           // 追加或更新聊天内容
+          currentState.appendChatContent(messageId, {
+            text
+          });
         }
       } else if (message === '[thinking]\n') {
         // Do nothing for now.
@@ -45,13 +50,6 @@ export const createWebsocketSlice = (set, get) => ({
       } else if (message.startsWith('[+&]')) {
         let msg = message.split('[+&]');
         get().appendSpeechInterim(msg[1]);
-      } else if (message.startsWith('[+transcript]')) {
-        const id = message.split('?id=')[1].split('&speakerId=')[0];
-        const speakerId = message.split('&speakerId=')[1].split('&text=')[0];
-        const text = message.split('&text=')[1].split('&timestamp=')[0];
-        const timestamp = message.split('&timestamp=')[1].split('&duration')[0];
-        const duration = message.split('&duration=')[1];
-        get().appendTranscriptContent(id, speakerId, text, timestamp, duration);
       } else if(message.startsWith('[+transcript_audio]')) {
          try{
             // 使用正则表达式提取参数值
@@ -138,7 +136,7 @@ export const createWebsocketSlice = (set, get) => ({
         ws_url +
         `/ws/${sessionId}?llm_model=${
           get().selectedModel.values().next().value
-        }&platform=web&isJournalMode=${get().isJournalMode}&character_id=${
+        }&platform=web&character_id=${
           get().character.character_id
         }&language=${language}&token=${get().token}`;
       let socket = new WebSocket(ws_path);

@@ -1,5 +1,4 @@
 import LanguagePanel from './LanguagePanel';
-import EnhancePanel from './EnhancePanel';
 
 export default function SettingPanel() {
   return (
@@ -10,7 +9,6 @@ export default function SettingPanel() {
       </section>
       <section>
         <header className="pb-5">Advanced options</header>
-        <EnhancePanel />
       </section>
     </div>
   );

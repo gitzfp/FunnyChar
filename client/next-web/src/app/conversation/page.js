@@ -17,13 +17,12 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useAppStore } from '@/zustand/store';
 import lz from 'lz-string';
 import { playAudios } from '@/util/audioUtils';
-import JournalMode from './_components/JournalMode';
 
 export default function Conversation() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isTextMode, setIsTextMode] = useState(true);
-  const { isJournalMode, setIsJournalMode, resetJournal, resetSpeakersList } =
+  const { resetJournal, resetSpeakersList } =
     useAppStore();
   const { character, getAudioList, setCharacter, clearChatContent } =
     useAppStore();
@@ -69,7 +68,6 @@ export default function Conversation() {
       lz.decompressFromEncodedURIComponent(characterString)
     );
     setCharacter(character);
-    setIsJournalMode(false);
     resetJournal();
     resetSpeakersList();
   }, []);
@@ -204,14 +202,7 @@ export default function Conversation() {
     setCharacter({});
   };
 
-  // For journal mode
-  useEffect(() => {
-    if (isJournalMode) {
-      enableVAD();
-    } else {
-      disableVAD();
-    }
-  }, [isJournalMode]);
+
 
   return (
     <div className="relative h-screen conversation_container">
@@ -224,8 +215,6 @@ export default function Conversation() {
           type="audio/mp3"
         />
       </audio>
-      {!isJournalMode ? (
-        <>
           <div className="fixed top-0 w-full bg-background z-10">
             <div className="grid grid-cols-4 gap-5 pt-4 md:pt-5 items-center">
               <div>
@@ -304,10 +293,6 @@ export default function Conversation() {
               <TextMode isDisplay={isTextMode} />
             </div>
           </div>
-        </>
-      ) : (
-        <JournalMode />
-      )}
     </div>
   );
 }

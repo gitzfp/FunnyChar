@@ -89,9 +89,12 @@ class WhisperX(Singleton, SpeechToText):
             import whisperx
 
             self.device = "cuda" if torch.cuda.is_available() else "cpu"
-            compute_type = "float16" if self.device.startswith("cuda") else "default"
-            logger.info(f"Loading [Local WhisperX] model: [{MODEL}]({self.device}) ...")
-            self.model = whisperx.load_model(MODEL, self.device, compute_type=compute_type)
+            compute_type = "float16" if self.device.startswith(
+                "cuda") else "default"
+            logger.info(
+                f"Loading [Local WhisperX] model: [{MODEL}]({self.device}) ...")
+            self.model = whisperx.load_model(
+                MODEL, self.device, compute_type=compute_type)
             if DIARIZATION:
                 self.align_model = {
                     language_code: whisperx.load_align_model(
@@ -106,7 +109,8 @@ class WhisperX(Singleton, SpeechToText):
             if OPENCC:
                 import opencc
 
-                assert OPENCC in ["t2s", "s2t"], 'OPENCC should be either "t2s" or "s2t"'
+                assert OPENCC in [
+                    "t2s", "s2t"], 'OPENCC should be either "t2s" or "s2t"'
                 self.chinese_t2s = opencc.OpenCC(f"{OPENCC}.json")
 
             self._transcribe = self._transcribe_local
@@ -116,7 +120,8 @@ class WhisperX(Singleton, SpeechToText):
     @timed
     def transcribe(self, audio_bytes, platform="web", prompt="", language="", suppress_tokens=[-1]):
         logger.info("Transcribing audio...")
-        result = self._transcribe(audio_bytes, platform, prompt, language, suppress_tokens)
+        result = self._transcribe(
+            audio_bytes, platform, prompt, language, suppress_tokens)
         if isinstance(result, dict):
             segments = result.get("segments", [])
             text = " ".join([seg.get("text", "").strip() for seg in segments])
@@ -151,7 +156,8 @@ class WhisperX(Singleton, SpeechToText):
                 True,
                 speaker_audio_samples,
             )
-            if not response or not response["segments"]:  # empty transcript not allowed
+            # empty transcript not allowed
+            if not response or not response["segments"]:
                 return []
             transcript.id = str(uuid.uuid4().hex)
             transcript.timestamp = timestamp
@@ -180,13 +186,15 @@ class WhisperX(Singleton, SpeechToText):
         for transcript in transcripts[1:]:
             start_times.append(len(audio) / 16000 + gap + 0.5)
             audio_slice = self.get_audio(transcript.audio_bytes, platform)
-            audio = np.concatenate([audio, np.zeros(16000 * gap, np.float32), audio_slice])
+            audio = np.concatenate(
+                [audio, np.zeros(16000 * gap, np.float32), audio_slice])
         buffer = io.BytesIO()
         wav = torch.from_numpy(audio[None, :])
         torchaudio.save(buffer, wav, 16000, format="wav")  # type: ignore
         audio_bytes = buffer.getvalue()
         # transcribe
-        response = self._transcribe(audio_bytes, platform, prompt, language, suppress_tokens, True)
+        response = self._transcribe(
+            audio_bytes, platform, prompt, language, suppress_tokens, True)
         if not response:
             return []
         word_segments = response["word_segments"]
@@ -240,7 +248,8 @@ class WhisperX(Singleton, SpeechToText):
             for seg in result["segments"]:
                 seg["text"] = self.chinese_t2s.convert(seg["text"])
 
-        segments = [DiarizedSingleSegment(**seg, speaker="") for seg in result["segments"]]
+        segments = [DiarizedSingleSegment(
+            **seg, speaker="") for seg in result["segments"]]
         response = WhisperXResponse(
             segments=segments, language=result["language"], word_segments=[]
         )
@@ -271,15 +280,12 @@ class WhisperX(Singleton, SpeechToText):
         import torch
         import torchaudio
 
-        if platform == "twilio":
-            reader = torchaudio.io.StreamReader(
-                io.BytesIO(audio_bytes), format="mulaw", option={"sample_rate": "8000"}
-            )
-        else:
-            reader = torchaudio.io.StreamReader(io.BytesIO(audio_bytes))
+        reader = torchaudio.io.StreamReader(io.BytesIO(audio_bytes))
         reader.add_basic_audio_stream(1000, sample_rate=16000)
-        wav = torch.concat([chunk[0] for chunk in reader.stream()])  # type: ignore
-        audio: np.ndarray = wav.mean(dim=1).flatten().numpy().astype(np.float32)
+        wav = torch.concat([chunk[0]
+                           for chunk in reader.stream()])  # type: ignore
+        audio: np.ndarray = wav.mean(
+            dim=1).flatten().numpy().astype(np.float32)
         if verbose:
             logger.info(f"Wav Shape: {wav.shape}")
             logger.info(f"Audio length: {len(audio) / 16000:.2f} s")
@@ -329,7 +335,8 @@ class WhisperX(Singleton, SpeechToText):
 
         # diarize
         num_speakers = len(speaker_audios)
-        diarize_segments = self.diarize_model(ext_audio, min_speakers=0, max_speakers=num_speakers)
+        diarize_segments = self.diarize_model(
+            ext_audio, min_speakers=0, max_speakers=num_speakers)
 
         # figure out speaker id map
         speaker_id = {}
@@ -403,7 +410,8 @@ class WhisperX(Singleton, SpeechToText):
         data = {"metadata": json.dumps(metadata)}
         url = WHISPER_X_API_URL_JOURNAL if diarization else WHISPER_X_API_URL
         try:
-            logger.info(f"Sent request to whisperX server {url}: {len(audio_bytes)} bytes")
+            logger.info(
+                f"Sent request to whisperX server {url}: {len(audio_bytes)} bytes")
             response = requests.post(url, data=data, files=files)
             return WhisperXResponse(**response.json())
         except requests.exceptions.Timeout as e:
@@ -411,6 +419,7 @@ class WhisperX(Singleton, SpeechToText):
         except requests.exceptions.RequestException as e:
             logger.error(f"Could not connect to whisperX server {url}: {e}")
         except KeyError as e:
-            logger.error(f"Could not parse response from whisperX server {url}: {e}")
+            logger.error(
+                f"Could not parse response from whisperX server {url}: {e}")
         except Exception as e:
             logger.error(f"Unknown error from whisperX server {url}: {e}")

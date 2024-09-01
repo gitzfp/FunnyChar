@@ -53,8 +53,6 @@ class DeepgramTranscriber(Singleton, SpeechToText):
         start_time = time.time()  # 开始计时
         if platform == "web":
             audio = self._convert_webm_to_wav(audio_bytes)
-        elif platform == "twilio":
-            audio = self._ulaw_to_wav(audio_bytes)
         else:
             audio = self._convert_bytes_to_wav(audio_bytes)
 

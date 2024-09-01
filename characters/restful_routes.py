@@ -41,6 +41,7 @@ from characters.models.character import (
 )
 from fastapi.responses import JSONResponse
 import aiofiles
+from characters.utils import upload_file_to_oss
 
 
 router = APIRouter()
@@ -109,7 +110,7 @@ async def status():
 
 
 @router.get("/characters")
-async def characters():
+async def characters(db: Session = Depends(get_db)):
     gcs_path = os.getenv("GCP_STORAGE_URL")
     if not gcs_path:
         raise HTTPException(
@@ -119,29 +120,29 @@ async def characters():
 
     def get_image_url(character):
         if character.data and "avatar_filename" in character.data:
-            return f'{gcs_path}/{character.data["avatar_filename"]}'
+            return character.data["avatar_filename"]
         else:
-            return f"{gcs_path}/static/funnychar/{character.character_id}.jpg"
+            return ""
 
-    # uid = user["uid"] if user else None
-    from characters.character_catalog.catalog_manager import CatalogManager
+    # Fetch characters from the database
+    characters = await asyncio.to_thread(
+        db.query(Character).filter(Character.visibility ==
+                                   "public").all
+    )
 
-    catalog: CatalogManager = CatalogManager.get_instance()
     return [
         {
-            "character_id": character.character_id,
+            "character_id": character.id,
             "name": character.name,
-            "source": character.source,
             "voice_id": character.voice_id,
-            "author_name": character.author_name,
-            "audio_url": f"{gcs_path}/static/funnychar/{character.character_id}.mp3",
+            "background_text": character.background_text,
+            "system_prompt": character.system_prompt,
+            "audio_url": f"{gcs_path}/static/funnychar/{character.id}.mp3",
             "image_url": get_image_url(character),
             "tts": character.tts,
             "is_author": False,
-            "location": character.location,
         }
-        for character in sorted(catalog.characters.values(), key=lambda c: c.order)
-        if character.visibility == "public"
+        for character in characters
     ]
 
 
@@ -231,32 +232,20 @@ async def upload_file(file: UploadFile = File(...)):
     #         headers={"WWW-Authenticate": "Bearer"},
     #     )
 
-    storage_client = storage.Client()
-    bucket_name = os.environ.get("GCP_STORAGE_BUCKET_NAME")
-    if not bucket_name:
-        raise HTTPException(
-            status_code=http_status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="GCP_STORAGE_BUCKET_NAME is not set",
-        )
-
-    bucket = storage_client.bucket(bucket_name)
-
-    # Create a new filename with a timestamp and a random uuid to avoid duplicate filenames
-    file_extension = os.path.splitext(
-        file.filename)[1] if file.filename else ""
-    new_filename = (
-        f"user_upload/"
-        f"{datetime.datetime.now().strftime('%Y%m%d-%H%M%S')}-"
-        f"{uuid.uuid4()}{file_extension}"
-    )
-
-    blob = bucket.blob(new_filename)
-
     contents = await file.read()
 
-    await asyncio.to_thread(blob.upload_from_string, contents)
+    # Create a filename prefix with a timestamp to avoid duplicate filenames
+    filename_prefix = f"user_upload/{datetime.datetime.now().strftime('%Y%m%d-%H%M%S')}-"
 
-    return {"filename": new_filename, "content-type": file.content_type}
+    try:
+        oss_path = await upload_file_to_oss(contents, filename_prefix)
+    except Exception as e:
+        raise HTTPException(
+            status_code=http_status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to upload file to OSS: {str(e)}",
+        )
+
+    return {"filename": oss_path, "content-type": file.content_type}
 
 
 @router.post("/create_character")
@@ -436,7 +425,6 @@ async def clone_voice(filelist: list[UploadFile] = Form(...), user=Depends(get_c
         await asyncio.to_thread(blob.upload_from_string, contents)
 
     # Construct the data for the API request
-    # TODO: support more voice cloning services.
     data = {
         "name": user["uid"] + "_" + voice_request_id,
     }

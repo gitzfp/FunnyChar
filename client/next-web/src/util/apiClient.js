@@ -179,26 +179,6 @@ export async function editCharacter(editCharacterRequest, accessToken) {
   }
 }
 
-export async function makeTwilioCall(number, vad_threshold, character_id) {
-  const url = getApiServerUrl() + '/twilio/call';
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      target_number: number,
-      character_id: character_id,
-      vad_threshold: vad_threshold
-    }),
-  });
-
-  if (response.ok) {
-    return await response.json();
-  } else {
-    throw new Error(await response.text());
-  }
-}
 
 export async function generateHighlight(generateHighlightRequest, accessToken) {
   const url = getApiServerUrl() + '/generate_highlight';

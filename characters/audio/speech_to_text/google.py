@@ -25,11 +25,6 @@ config = types.SimpleNamespace(
             "max_alternatives": 1,
             "enable_automatic_punctuation": True,
         },
-        "twilio": {
-            "encoding": speech.RecognitionConfig.AudioEncoding.MULAW,
-            "sample_rate_hertz": 8000,
-            "language_code": "en-uS",
-        },
     }
 )
 
@@ -54,7 +49,8 @@ class Google(Singleton, SpeechToText):
         if language != "en-US":
             batch_config.alternative_language_codes = ["en-US"]
         response = self.client.recognize(
-            config=batch_config, audio=speech.RecognitionAudio(content=audio_bytes)
+            config=batch_config, audio=speech.RecognitionAudio(
+                content=audio_bytes)
         )
         if not response.results:
             return ""

@@ -46,7 +46,7 @@ export default function Create() {
             Back
           </Link>
         </p>
-        <h1 className='text-center text-2xl font-medium'>Create a character</h1>
+        <h1 className='text-center text-2xl font-medium'>创建角色</h1>
         <AvatarUploader />
         <div>
           <Input
@@ -127,11 +127,8 @@ export default function Create() {
         </div>
         <div>
           <Button onPress={handleSubmit} className='bg-real-contrastBlue w-full'>
-            Submit
+            提交 
           </Button>
-          <p className='text-tiny text-warning'>
-            *It may take 30 seconds for the new character to be available.
-          </p>
         </div>
       </form>
       <Footer />

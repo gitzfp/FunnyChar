@@ -5,7 +5,6 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from characters.audio.speech_to_text import get_speech_to_text
 from characters.audio.text_to_speech import get_text_to_speech
-from characters.character_catalog.catalog_manager import CatalogManager
 from characters.restful_routes import router as restful_router
 from characters.chat_routes import router as chat_router
 from characters.utils import ConnectionManager
@@ -40,7 +39,6 @@ app.include_router(chat_router)
 app.include_router(websocket_router)
 
 # initializations
-CatalogManager.initialize()
 ConnectionManager.initialize()
 get_text_to_speech()
 get_speech_to_text()
