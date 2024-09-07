@@ -166,8 +166,4 @@ export const createWebsocketSlice = (set, get) => ({
     set({ sessionId: id });
   },
 
-  token: '',
-  setToken: (token) => {
-    set({ token: token });
-  },
 });

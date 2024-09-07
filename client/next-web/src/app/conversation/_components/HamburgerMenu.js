@@ -4,7 +4,6 @@ import { RxHamburgerMenu, RxCross2 } from 'react-icons/rx';
 import { BiSolidLockAlt } from 'react-icons/bi';
 import styles from './HamburgerMenu.module.css';
 import { useAppStore } from '@/zustand/store';
-import { useUser } from '@clerk/nextjs';
 
 export default function HamburgerMenu() {
   const [open, cycleOpen] = useCycle(false, true);
@@ -32,7 +31,7 @@ export default function HamburgerMenu() {
     languageList,
     handleLanguageChange,
   } = useAppStore();
-  const { user } = useUser();
+  const { user } = useAppStore();
 
   return (
     <>

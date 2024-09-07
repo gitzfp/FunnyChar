@@ -5,36 +5,44 @@ import {
   DropdownItem
 } from '@nextui-org/dropdown';
 import { Avatar } from '@nextui-org/avatar';
-// import signout from '@/firebase/auth/signout';
-import {useAppStore} from "@/zustand/store";
-import {useEffect} from "react";
-import { useAuth } from '@clerk/nextjs';
+import { useAppStore } from "@/zustand/store";
+import { useEffect } from "react";
+import { useRouter } from 'next/navigation';
 
 export default function UserDropdown({ user }) {
-  const {setToken} = useAppStore();
-  const {signOut} = useAuth()
-  useEffect(()=> {
-    setToken(user.accessToken);
-  }, []);
+  const { setToken, signOut } = useAppStore();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (user && user.accessToken) {
+      setToken(user.accessToken);
+    }
+  }, [user, setToken]);
+
   async function handleMenuClick(key) {
     switch(key) {
       case 'profile':
-        return;
-      // case 'create':
-      //   return;
-      // case 'delete':
-      //   return;
+        // 处理个人资料逻辑
+        break;
       case 'logout':
-        const { result, error } = await signOut();
-        if (error) {
-          console.log(error);
-          return;
+        try {
+          const { result, error } = await signOut();
+          if (error) {
+            console.error('Logout error:', error);
+            // 可以在这里添加错误提示
+          } else if (result) {
+            console.log('Logged out successfully');
+            router.push('/login'); // 或者您希望重定向到的页面
+          }
+        } catch (error) {
+          console.error('Unexpected error during logout:', error);
         }
-        return;
+        break;
       default:
-        return;
+        break;
     }
   }
+
   return (
     <Dropdown placement="bottom-end">
       <DropdownTrigger aria-label="Dropdown trigger">
@@ -52,8 +60,6 @@ export default function UserDropdown({ user }) {
           <p className="">Signed in as</p>
           <p className="">{user.email}</p>
         </DropdownItem>
-        {/* <DropdownItem key="create">Create a character</DropdownItem>
-        <DropdownItem key="delete">Delete a character</DropdownItem> */}
         <DropdownItem key="logout" color="danger">Log Out</DropdownItem>
       </DropdownMenu>
     </Dropdown>

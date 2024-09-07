@@ -21,6 +21,15 @@ from google.cloud import storage
 from fastapi import HTTPException, status as http_status
 import oss2
 
+from passlib.context import CryptContext
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+def verify_password(plain_password, hashed_password):
+    return pwd_context.verify(plain_password, hashed_password)
+
+def get_password_hash(password):
+    return pwd_context.hash(password)
 
 logger = get_logger(__name__)
 

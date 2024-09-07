@@ -4,13 +4,10 @@ import { useEffect } from 'react';
 import { Navbar, NavbarContent, NavbarItem } from '@nextui-org/navbar';
 import UserDropdown from './UserDropdown';
 import { useAppStore } from '@/zustand/store';
-import { useAuth, useUser } from '@clerk/nextjs';
 
 export default function Header() {
-  const { getToken } = useAuth();
-  const { user} = useUser();
-  const { token, setToken } = useAppStore();
-
+  const { user, token, setToken, getToken } = useAppStore();
+  console.log(user, token, "用户信息");
   useEffect(() => {
     const getUserToken = async () => {
       const token = await getToken();
@@ -35,7 +32,7 @@ export default function Header() {
             <span>去登录</span>
           ) : (
             <UserDropdown user={{
-              displayName: user?.primaryPhoneNumber?.phoneNumber,
+              displayName: user?.phone,
               accessToken: token,
               photoUrl: user?.imageUrl,
               email: user?.id,

@@ -63,3 +63,5 @@ elevenlabs==1.6.1
 mysqlclient
 mysql-connector-python
 oss2
+passlib
+bcrypt

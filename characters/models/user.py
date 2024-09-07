@@ -8,8 +8,9 @@ class User(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String(100))
-    email = Column(String(100), unique=True, index=True, nullable=False)
-
+    phone = Column(String(100), unique=True, index=True, nullable=False)
+    email = Column(String(100), unique=True, index=True)
+    password = Column(String(100), nullable=False)
     def save(self, db):
         db.add(self)
         db.commit()

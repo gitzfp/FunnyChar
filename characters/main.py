@@ -9,6 +9,7 @@ from characters.restful_routes import router as restful_router
 from characters.chat_routes import router as chat_router
 from characters.utils import ConnectionManager
 from characters.websocket_routes import router as websocket_router
+from characters.verification_routes import router as verification_router
 
 import ssl
 from aiohttp import TCPConnector
@@ -37,6 +38,7 @@ app.add_middleware(
 app.include_router(restful_router)
 app.include_router(chat_router)
 app.include_router(websocket_router)
+app.include_router(verification_router)
 
 # initializations
 ConnectionManager.initialize()

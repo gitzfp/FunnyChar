@@ -6,10 +6,9 @@ import TabButton from '@/components/TabButton';
 import { useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
 import { useAppStore } from '@/zustand/store';
-import { useAuth } from "@clerk/nextjs";
 
 export default function Tabs({ characters }) {
-  const { userId: user } = useAuth();
+  const { user } = useAppStore();
   const { tabNow, setTabNow } = useAppStore();
   const searchParams = useSearchParams();
 

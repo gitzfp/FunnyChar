@@ -6,11 +6,10 @@ import {
 import { BiSolidLockAlt } from 'react-icons/bi';
 
 import { useAppStore } from '@/zustand/store';
-import { useUser } from '@clerk/nextjs';
 
 export default function LanguageModelControl() {
   const { models, selectedModel, handleModelChange } = useAppStore();
-  const { user } = useUser();
+  const { user } = useAppStore();
 
   return (
     <>
