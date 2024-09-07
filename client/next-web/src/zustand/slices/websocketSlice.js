@@ -25,6 +25,7 @@ export const createWebsocketSlice = (set, get) => ({
           get().setMessageId(messageId);
           const params = new URLSearchParams(message.substring(message.indexOf('?')));
           const text = params.get('text');
+          const currentState = get();
            // 追加或更新聊天内容
           currentState.appendChatContent(messageId, {
             text

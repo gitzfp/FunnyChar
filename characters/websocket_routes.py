@@ -229,9 +229,10 @@ async def handle_receive(
                 priority=0,
             )
         )
+        message_id = str(uuid.uuid4().hex)[:16]
         tts_task.add_done_callback(task_done_callback)
         # Send end of the greeting so the client knows when to start listening
-        await manager.send_message(message="[end]\n", websocket=websocket)
+        await manager.send_message(message=f"[end={message_id}]\n", websocket=websocket)
 
         async def on_new_token(token):
             return await manager.send_message(message=token, websocket=websocket)
@@ -253,7 +254,6 @@ async def handle_receive(
         speech_recognition_interim = False
         current_speech = ""
 
-        speaker_audio_samples = {}
 
         while True:
             data = await websocket.receive()
@@ -304,16 +304,16 @@ async def handle_receive(
                     language=language,
                     message_id=str(uuid.uuid4().hex)[:16],
                     llm_config=llm.get_config(),
-                    audio_url=audio_url
+                    audio_url=""
                 )
                 await asyncio.to_thread(interaction.save, db)
 
                 # 5. return response to client
-                async def text_mode_tts_task_done_call_back(response, message_id):
+                async def text_mode_tts_task_done_call_back(response, message_id, msg_data):
                     logger.info(
                         f"text_mode_tts_task_done_call_back is called, response: {response}, message_id: {message_id}")
                     # Send response to client, indicates the response is done
-                    await manager.send_message(message=f"[end={message_id}]\n??text={response}", websocket=websocket)
+                    await manager.send_message(message=f"[end={message_id}]\n?text={response}", websocket=websocket)
                     # Update conversation history
                     conversation_history.user.append(msg_data)
                     conversation_history.ai.append(response)
@@ -345,7 +345,7 @@ async def handle_receive(
                         character=character,
                         callback=AsyncCallbackTextHandler(
                             on_new_token, token_buffer, partial(
-                                text_mode_tts_task_done_call_back, message_id=message_id)  # Pass message_id here
+                                text_mode_tts_task_done_call_back, message_id=message_id, msg_data=msg_data)  # Pass message_id here
                         ),
                         audioCallback=AsyncCallbackAudioHandler(
                             text_to_speech, websocket, tts_event, character.voice_id, language
@@ -393,11 +393,11 @@ async def handle_receive(
                 if not transcript or len(transcript) < 2:
                     continue
 
-                # 2. Send Pronounation score
-                asyncio.create_task(
-                    audio_service.send_score(binary_data, transcript,
-                                             message_id, websocket, manager)
-                )
+                # TODO: 2.Send Pronounation score
+                # asyncio.create_task(
+                #     audio_service.send_score(binary_data, transcript,
+                #                              message_id, websocket, manager)
+                # )
 
                 # 3. Save user message
                 interaction = Interaction(

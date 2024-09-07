@@ -57,27 +57,38 @@ export const playAudios = async (
         return;
     }
     setIsPlaying(true);
-    while (audioContext && audioPlayerRef.current && audioSourceNode && audioQueueRef.current?.length > 0) {
-        // If the user leaves the page and buffer got deteched.
-        if (audioQueueRef.current[0].detached) {
-            console.log('Audio buffer detached, play cancelled.');
-            return;
-        }
-        console.log('Playing audio ', audioQueueRef.current[0].byteLength, ' bytes...');
-        const audioBuffer = await audioContext.decodeAudioData(
-            audioQueueRef.current[0]
-        );
-        const bs = audioContext.createBufferSource();
-        bs.buffer = audioBuffer;
-        bs.connect(audioSourceNode);
+    try {
+        while (audioContext && audioPlayerRef.current && audioSourceNode && audioQueueRef.current?.length > 0) {
+            const currentAudio = audioQueueRef.current[0];
+            console.log('Current audio details:', {
+                byteLength: currentAudio?.byteLength,
+                type: currentAudio?.type,
+                isArrayBuffer: currentAudio instanceof ArrayBuffer,
+            });
 
-        await playAudio(
-            audioPlayerRef,
-            bs
-        );
-        popAudioQueueFront();
+            if (!currentAudio || currentAudio.byteLength === 0) {
+                console.log('Invalid audio data, removing from queue.');
+                popAudioQueueFront();
+                continue;
+            }
+
+            try {
+                const audioBuffer = await audioContext.decodeAudioData(currentAudio);
+                const bs = audioContext.createBufferSource();
+                bs.buffer = audioBuffer;
+                bs.connect(audioSourceNode);
+
+                await playAudio(audioPlayerRef, bs);
+            } catch (decodeError) {
+                console.error('Error decoding audio:', decodeError);
+                console.log('Skipping problematic audio chunk');
+            }
+            popAudioQueueFront();
+        }
+        console.log('Done playing audios');
+    } catch (error) {
+        console.error('Error in playAudios:', error);
+    } finally {
+        setIsPlaying(false);
     }
-    // done playing audios
-    console.log('Done playing audios')
-    setIsPlaying(false);
 };
