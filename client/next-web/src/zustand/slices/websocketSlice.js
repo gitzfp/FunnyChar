@@ -25,36 +25,18 @@ export const createWebsocketSlice = (set, get) => ({
           get().setMessageId(messageId);
           const params = new URLSearchParams(message.substring(message.indexOf('?')));
           const text = params.get('text');
+          const speech = params.get('speech');
+          console.log("websocketSlice======[end]:", message, "text:",text, "speech:",speech)
           const currentState = get();
            // 追加或更新聊天内容
           currentState.appendChatContent(messageId, {
             text
           });
         }
-      } else if (message === '[thinking]\n') {
-        // Do nothing for now.
-        // setIsThinking(true);
-      } else if (message.startsWith('[+]You said: ')) {
-        // [+] indicates the transcription is done.
-        let msg = message.split('[+]You said: ');
-        // Interrupted message has no end signal, so manually clear it.
-        if (get().speechInterim != null) {
-          get().appendChatContent();
-        }
-        get().setSender('user');
-        get().appendInterimChatContent(msg[1]);
-        get().appendChatContent();
-        get().clearSpeechInterim();
-      } else if (message.startsWith('[=]' || message.match(/\[=([a-zA-Z0-9]+)]/))) {
-        // [=] or [=id] indicates the response is done
-        get().appendChatContent();
-      } else if (message.startsWith('[+&]')) {
-        let msg = message.split('[+&]');
-        get().appendSpeechInterim(msg[1]);
       } else if(message.startsWith('[+transcript_audio]')) {
          try{
             // 使用正则表达式提取参数值
-            console.log("webcoketSlice收到消息:", message)
+            console.log("websocketSlice=收到消息:", message)
             const params = new URLSearchParams(message.substring(message.indexOf('?')));
             const text = params.get('text');
             const audioUrl = params.get('audioUrl');
@@ -86,6 +68,7 @@ export const createWebsocketSlice = (set, get) => ({
             console.log("捕获到错误消息", err)
          }
       } else {
+        console.log("websocketSlice=最后收到消息:", message)
         get().setSender('character');
         get().appendInterimChatContent(event.data);
 

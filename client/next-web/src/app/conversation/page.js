@@ -2,12 +2,9 @@
 
 import { Button } from '@nextui-org/button';
 import { Tooltip } from '@nextui-org/tooltip';
-import SettingBar from './_components/SettingBar';
 import Chat from './_components/Chat';
 import HandsFreeMode from './_components/HandsFreeMode';
 import TextMode from './_components/TextMode';
-import HamburgerMenu from './_components/HamburgerMenu';
-import ShareButton from './_components/SettingBar/ShareButton';
 import TabButton from '@/components/TabButton';
 import Image from 'next/image';
 import exitIcon from '@/assets/svgs/exit.svg';
@@ -161,7 +158,7 @@ export default function Conversation() {
     }
   }, [audioContext, audioQueueRef.current?.length]);
 
-  const { isMute, setIsMute, disableMic, setDisableMic } = useAppStore();
+  const {disableMic} = useAppStore();
 
   function handsFreeMode() {
     setIsTextMode(false);
@@ -173,22 +170,6 @@ export default function Conversation() {
   function textMode() {
     setIsTextMode(true);
     disableVAD();
-  }
-
-  function toggleMute() {
-    if (!isMute) {
-      stopAudioPlayback();
-    }
-    setIsMute(!isMute);
-  }
-
-  function handleMic() {
-    if (disableMic) {
-      enableVAD();
-    } else {
-      disableVAD();
-    }
-    setDisableMic(!disableMic);
   }
 
   const cleanUpStates = () => {
@@ -264,24 +245,10 @@ export default function Conversation() {
                   <span className="hidden lg:inline">&nbsp;mode</span>
                 </TabButton>
               </div>
-              <div className="flex flex-row justify-self-end md:hidden">
-                <ShareButton />
-                <HamburgerMenu />
-              </div>
-            </div>
-            <div className="flex flex-col mt-4 md:mt-5 pt-2 md:pt-5 pb-5 border-t-2 border-divider md:mx-auto md:w-unit-9xl lg:w-[892px]">
-              <SettingBar
-                isTextMode={isTextMode}
-                isMute={isMute}
-                toggleMute={toggleMute}
-                disableMic={disableMic}
-                handleMic={handleMic}
-              />
             </div>
           </div>
           <div className="h-full -mb-24">
-            <div className="h-[154px] md:h-[178px]"></div>
-            {!isTextMode && <div className="h-[250px] md:h-[288px]"></div>}
+            <div className="h-[104px] md:h-[128px]"></div>
             <div className="w-full px-4 md:px-0 mx-auto md:w-unit-9xl lg:w-[892px]">
               <Chat />
             </div>

@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@clerk/nextjs": "^5.2.14",
+    "@heroicons/react": "^2.1.5",
     "@nextui-org/avatar": "^2.0.21",
     "@nextui-org/react": "^2.1.13",
     "@react-three/drei": "9.75.0",
@@ -31,6 +32,7 @@
     "postcss": "8.4.28",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "react-hot-toast": "^2.4.1",
     "react-icons": "^4.10.1",
     "react-input-emoji": "^5.3.1",
     "swr": "^2.2.1",

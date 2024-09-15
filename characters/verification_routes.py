@@ -1,9 +1,11 @@
 import jwt
 from datetime import datetime, timedelta, UTC
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, Depends
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel, field_validator
 from sqlalchemy.orm import Session
 from characters.database.connection import get_db
+from characters.logger import get_logger
 from characters.models.user import User
 from characters.utils import verify_password, get_password_hash
 import re
@@ -14,6 +16,8 @@ router = APIRouter()
 SECRET_KEY = "your_secret_key"  # 请替换为你的实际密钥
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
+
+logger = get_logger(__name__)
 
 def create_access_token(data: dict):
     to_encode = data.copy()
@@ -52,10 +56,21 @@ async def login(request: LoginRequest, db: Session = Depends(get_db)):
             # 如果用户存在，验证密码
             if verify_password(request.password, user.password):
                 token = create_access_token(data={"sub": user.phone})
-                return {"message": "登录成功", "userId": user.id, "token": token}
+                return {"message": "���录成功", "userId": user.id, "token": token}
             else:
-                raise HTTPException(status_code=401, detail="密码错误")
+                logger.error(f"密码错误: {request.password} {user.password}")
+                return JSONResponse(
+                    status_code=401,
+                    content={"detail": "密码错误"}
+                )
     except ValueError as ve:
-        raise HTTPException(status_code=400, detail=str(ve))
+        return JSONResponse(
+            status_code=400,
+            content={"detail": str(ve)}
+        )
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error(f"服务器错误: {str(e)}")
+        return JSONResponse(
+            status_code=500,
+            content={"detail": "服务器内部错误"}
+        )

@@ -5,8 +5,6 @@ from dataclasses import dataclass
 from functools import partial  # Add this import
 
 from fastapi import APIRouter, Depends, HTTPException, Path, Query, WebSocket, WebSocketDisconnect
-from firebase_admin import auth
-from firebase_admin.exceptions import FirebaseError
 from sqlalchemy.orm import Session
 
 from characters.audio.speech_to_text import get_speech_to_text, SpeechToText
@@ -267,14 +265,13 @@ async def handle_receive(
             if "text" in data:
                 timer.start("LLM First Token")
                 msg_data = data["text"]
-
                 # 1. Whether client will send speech interim audio clip in the next message.
                 if msg_data.startswith("[&Speech]"):
                     speech_recognition_interim = True
                     # stop the previous audio stream, if new transcript is received
                     await stop_audio()
                     continue
-
+                
                 # 2. If client finished speech, use the sentence as input.
                 message_id = str(uuid.uuid4().hex)[:16]
                 if msg_data.startswith("[SpeechFinished]"):
@@ -286,9 +283,7 @@ async def handle_receive(
                     if not current_speech:
                         continue
 
-                    await manager.send_message(
-                        message=f"[+]You said: {current_speech}", websocket=websocket
-                    )
+                    await manager.send_message(message=f"[end={message_id}]\n?text={current_speech}&speech=true", websocket=websocket)
                     current_speech = ""
 
                  # 3. Save user message
@@ -345,7 +340,7 @@ async def handle_receive(
                         character=character,
                         callback=AsyncCallbackTextHandler(
                             on_new_token, token_buffer, partial(
-                                text_mode_tts_task_done_call_back, message_id=message_id, msg_data=msg_data)  # Pass message_id here
+                                text_mode_tts_task_done_call_back, message_id=server_message_id, msg_data=msg_data)  # Pass message_id here
                         ),
                         audioCallback=AsyncCallbackAudioHandler(
                             text_to_speech, websocket, tts_event, character.voice_id, language
@@ -359,7 +354,7 @@ async def handle_receive(
             # handle binary message(audio)
             elif "bytes" in data:
                 binary_data = data["bytes"]
-
+                message_id = str(uuid.uuid4().hex)[:16]
                 # 0.检查是否为临时语音识别：
                 if speech_recognition_interim:
                     interim_transcript: str = (
@@ -376,15 +371,15 @@ async def handle_receive(
                     # Filter noises.
                     if not interim_transcript:
                         continue
-                    await manager.send_message(
-                        message=f"[+&]{interim_transcript}", websocket=websocket
-                    )
+     
+                    await manager.send_message(message=f"[+transcript_audio]"
+                                               f"?text={interim_transcript}&from=user&messageId={message_id}", websocket=websocket)
+
                     logger.info(f"Speech interim: {interim_transcript}")
                     current_speech = current_speech + " " + interim_transcript
                     continue
 
                 # 1. Transcribe audio
-                message_id = str(uuid.uuid4().hex)[:16]
                 audio_service = AudioProcessService()
                 transcript, audio_url = await audio_service.process_audio(binary_data, platform, character, message_id, websocket, manager)
                 print(f"翻译文字: {transcript}, 音频文件：{audio_url}")

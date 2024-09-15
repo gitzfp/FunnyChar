@@ -4,10 +4,9 @@ import {
 } from 'react-icons/ri';
 import { Button } from '@nextui-org/button';
 import { useAppStore } from '@/zustand/store';
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { FaPlay, FaStop } from 'react-icons/fa';
 import audioSvg from '@/assets/svgs/audio.svg';
-import {useState} from 'react'
 import Image from 'next/image';
 
 export default function Chat() {
@@ -94,37 +93,36 @@ export default function Chat() {
               >
                 {!line.audioUrl && <p className={"w-fit max-w-[450px] py-2 px-5 font-light flex-none rounded-3xl rounded-br-none bg-real-blue-500/50 whitespace-pre-wrap"}>{line.content}</p>}
                  {line.audioUrl &&   
-                    <div className="flex justify-center mt-1 relative h-10">
-                    <audio ref={audioRef} preload="none" onEnded={handleEnded}>
-                      Your browser does not support the audio tag.
-                    </audio> 
-                    <Image
-                      src={audioSvg}
-                      alt=""
-                      className="w-auto"
-                    />
-                    <Button
-                      isIconOnly
-                      variant="bordered"
-                      radius="full"
-                      color="white"
-                      className="opacity-70 absolute hover:opacity-80 hover:scale-105 hover:-translate-y-0.5 transform transition-transform"
-                      onPress={() => handlePlay(line.timestamp, line.audioUrl)}
-                    >
-                    {playingId !== line.timestamp ? (
-                      <FaPlay/>
-                    ) : (
-                      <FaStop/>
-                    )}
-                    </Button>
-                  </div>
-                
+                    <div className="flex flex-col justify-center mt-1 relative h-10">
+                      <div className='flex justify-center mt-1 relative h-10'>
+                          <audio ref={audioRef} preload="none" onEnded={handleEnded}>
+                            Your browser does not support the audio tag.
+                          </audio> 
+                          <Image
+                            src={audioSvg}
+                            alt=""
+                            className="w-auto"
+                          />
+                          <Button
+                            isIconOnly
+                            variant="bordered"
+                            radius="full"
+                            color="white"
+                            className="opacity-70 absolute hover:opacity-80 hover:scale-105 hover:-translate-y-0.5 transform transition-transform"
+                            onPress={() => handlePlay(line.timestamp, line.audioUrl)}
+                          >
+                          {playingId !== line.timestamp ? (
+                            <FaPlay/>
+                          ) : (
+                            <FaStop/>
+                          )}
+                          </Button>
+                      </div>
+                      <div className="text-center text-sm font-normal mb-2 mt-2">{line.content}</div>
+                    </div>
                 }
                 {speechResult && (
                     <div className="mt-4 p-2 bg-green-50 border border-green-200 rounded-md shadow-md w-full max-w-md">
-                      {/* 原文展示 */}
-                      <div className="text-center text-sm font-medium mb-2">{line.content}</div>
-
                       {/* 评分展示 */}
                       <div className="grid grid-cols-4 gap-2 text-center font-semibold text-sm mb-2">
                         <div>准确度</div>
