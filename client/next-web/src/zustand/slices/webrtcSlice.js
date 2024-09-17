@@ -60,7 +60,7 @@ export const createWebRTCSlice = (set, get) => ({
       e.candidate && pc.addIceCandidate(new RTCIceCandidate(e.candidate));
     pc.ontrack = (event) => {
       if (event.streams && event.streams[0]) {
-        get().audioPlayerRef.current.srcObject = event.streams[0];
+        if(get().audioPlayerRef?.current)get().audioPlayerRef.current.srcObject = event.streams[0];
       }
     };
     const stream = await navigator.mediaDevices.getUserMedia({

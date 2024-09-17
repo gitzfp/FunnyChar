@@ -14,13 +14,13 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useAppStore } from '@/zustand/store';
 import lz from 'lz-string';
 import { playAudios } from '@/util/audioUtils';
+import { v4 as uuidv4 } from 'uuid'; // 导入 UUID 库
 
 export default function Conversation() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isTextMode, setIsTextMode] = useState(true);
-  const { resetJournal, resetSpeakersList } =
-    useAppStore();
+
   const { character, getAudioList, setCharacter, clearChatContent } =
     useAppStore();
   // Websocket.
@@ -32,7 +32,6 @@ export default function Conversation() {
     connectMicrophone,
     startRecording,
     stopRecording,
-    closeMediaRecorder,
   } = useAppStore();
   // Audio player
   const audioPlayerRef = useRef(null);
@@ -65,8 +64,6 @@ export default function Conversation() {
       lz.decompressFromEncodedURIComponent(characterString)
     );
     setCharacter(character);
-    resetJournal();
-    resetSpeakersList();
   }, []);
 
   // Bind current audio player to state ref.
@@ -80,7 +77,7 @@ export default function Conversation() {
 
   useEffect(() => {
     if (mediaRecorder) {
-      closeMediaRecorder();
+      stopRecording();
     }
     if (rtcConnectionEstablished) {
       closePeer();
@@ -96,6 +93,7 @@ export default function Conversation() {
   }, [selectedMicrophone]);
 
   function initializeVAD() {
+    const clientMsgId = uuidv4();
     if (vadEvents) {
       closeVAD();
     }
@@ -106,11 +104,19 @@ export default function Conversation() {
       },
       () => {
         // Stops recording and send interim audio clip to server.
-        sendOverSocket('[&Speech]');
-        stopRecording();
-      },
+          const finalData = {
+            type: '[&Speech]',
+            clientMsgId: clientMsgId
+          };
+          sendOverSocket(JSON.stringify(finalData)); 
+          stopRecording();
+        },
       () => {
-        sendOverSocket('[SpeechFinished]');
+        const finalData = {
+            type: '[SpeechFinished]',
+            clientMsgId: clientMsgId
+          };
+        sendOverSocket(JSON.stringify(finalData)); 
       }
     );
     if (!isTextMode && !disableMic) {
@@ -176,7 +182,7 @@ export default function Conversation() {
     disableVAD();
     closeVAD();
     stopAudioPlayback();
-    closeMediaRecorder();
+    stopRecording();
     closePeer();
     closeSocket();
     clearChatContent();

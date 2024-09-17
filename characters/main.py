@@ -10,6 +10,7 @@ from characters.chat_routes import router as chat_router
 from characters.utils import ConnectionManager
 from characters.websocket_routes import router as websocket_router
 from characters.verification_routes import router as verification_router
+from characters.sencevoice_routes import router as sencevoice_router
 
 import ssl
 from aiohttp import TCPConnector
@@ -39,6 +40,7 @@ app.include_router(restful_router)
 app.include_router(chat_router)
 app.include_router(websocket_router)
 app.include_router(verification_router)
+app.include_router(sencevoice_router)
 
 # initializations
 ConnectionManager.initialize()

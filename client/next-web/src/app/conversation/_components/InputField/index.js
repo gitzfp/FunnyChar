@@ -5,6 +5,7 @@ import { IoIosSend } from 'react-icons/io';
 import ClickToTalk from './ClickToTalk';
 
 import { useAppStore } from '@/zustand/store';
+import { clientMsgId } from '@/util/common';
 
 export default function InputField() {
   const [text, setText] = useState('');
@@ -15,7 +16,12 @@ export default function InputField() {
     if (text) {
       stopAudioPlayback();
       appendUserChat(text);
-      sendOverSocket(text);
+      const finalData = {
+        content: text,
+        type: 'text',
+        clientMsgId: clientMsgId()
+      };
+      sendOverSocket(JSON.stringify(finalData));
       setText('');
     }
   }

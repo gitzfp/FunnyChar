@@ -22,21 +22,25 @@ export const createWebsocketSlice = (set, get) => ({
         const messageIdMatches = message.match(/\[end=([a-zA-Z0-9]+)]/);
         if (messageIdMatches) {
           const messageId = messageIdMatches[1];
-          get().setMessageId(messageId);
           const params = new URLSearchParams(message.substring(message.indexOf('?')));
           const text = params.get('text');
           const speech = params.get('speech');
           console.log("websocketSlice======[end]:", message, "text:",text, "speech:",speech)
           const currentState = get();
+          const appendOrUpdate = params.get('appendOrUpdate');
+          if(params.get('from')){
+              currentState.setSender(params.get('from')); 
+          }
+          console.log("websocketSlice======[end]:", message, "text:",text, "speech:",speech)
            // 追加或更新聊天内容
           currentState.appendChatContent(messageId, {
-            text
+            text,
+            appendOrUpdate
           });
         }
       } else if(message.startsWith('[+transcript_audio]')) {
          try{
             // 使用正则表达式提取参数值
-            console.log("websocketSlice=收到消息:", message)
             const params = new URLSearchParams(message.substring(message.indexOf('?')));
             const text = params.get('text');
             const audioUrl = params.get('audioUrl');
@@ -46,7 +50,8 @@ export const createWebsocketSlice = (set, get) => ({
 
             // 检查是否有中断的消息需要处理
             if (currentState.speechInterim != null) {
-                currentState.appendChatContent();
+                console.log("websocketSlice:","有中断消息，需要处理", message)
+                currentState.appendSpeechInterim(text);
             }
 
             // 设置发送者和处理消息内容
@@ -54,8 +59,7 @@ export const createWebsocketSlice = (set, get) => ({
             if(params.get('from')){
               currentState.setSender(params.get('from')); 
             }
-            currentState.appendInterimChatContent(text);
-
+            console.log(messageId,"...websocketSlice=收到[+transcript_audio]消息:", message,messageId)
             // 追加或更新聊天内容
             currentState.appendChatContent(messageId, {
               text,
@@ -67,21 +71,14 @@ export const createWebsocketSlice = (set, get) => ({
          }catch(err){
             console.log("捕获到错误消息", err)
          }
-      } else {
-        console.log("websocketSlice=最后收到消息:", message)
-        get().setSender('character');
-        get().appendInterimChatContent(event.data);
-
-        // if user interrupts the previous response, should be able to play audios of new response
-        get().setShouldPlayAudio(true);
-      }
+      } 
     } else {
       // binary data
       if (!get().shouldPlayAudio || get().isMute) {
         console.log('should not play audio');
         return;
       }
-      console.log('开始播放===========')
+      console.log('开始播放===========',  event.data.byteLength,)
       get().pushAudioQueue(event.data);
       console.log(
         'audio arrival: ',
@@ -97,7 +94,7 @@ export const createWebsocketSlice = (set, get) => ({
         ' isPlaying: ',
         get().isPlaying,
         ' isPlaying(player): ',
-        get().audioPlayerRef.current ? !get().audioPlayerRef.current.paused : undefined,
+        get().audioPlayerRef?.current ? !get().audioPlayerRef.current.paused : undefined,
         ' audios in queue: ',
         get().audioQueue.length
       );

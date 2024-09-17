@@ -10,7 +10,7 @@ import audioSvg from '@/assets/svgs/audio.svg';
 import Image from 'next/image';
 
 export default function Chat() {
-  const { chatContent, interimChat } = useAppStore();
+  const { chatContent} = useAppStore();
   const messageEndRef = useRef(null);
   const [playingId, setPlayingId] = useState('')
   const audioRef = useRef(null)
@@ -27,6 +27,7 @@ export default function Chat() {
       block: 'center',
       inline: 'nearest'
     })
+    console.log('Chat消息变化:', chatContent)
   }, [chatContent])
 
   function handleEnded() {
@@ -52,7 +53,7 @@ export default function Chat() {
   return (
     <div className={`flex flex-col gap-5 overflow-y-scroll min-h-25`}>
       {
-        [...chatContent, interimChat].map((line) => {
+        [...chatContent].map((line) => {
           if (line && line.hasOwnProperty('from') && line.from === 'character') {
             return (
               <div

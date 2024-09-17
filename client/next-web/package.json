@@ -39,6 +39,7 @@
     "tailwindcss": "3.3.3",
     "three": "0.153.0",
     "uuid": "^9.0.1",
+    "wavefile": "^11.0.0",
     "wavesurfer.js": "^7.3.2",
     "zustand": "^4.4.1"
   },

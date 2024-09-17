@@ -337,6 +337,7 @@ async def upload_file_to_oss(file_bytes: bytes, filename_prefix: str = "media/",
     参数:
     - file_bytes: 需要上传的文件数据.
     - filename_prefix: 存储在OSS中的文件名前缀.
+    - file_extension: 文件扩展名（可选）.
 
     返回值:
     - 存储在OSS中的文件的完整路径.
@@ -348,10 +349,22 @@ async def upload_file_to_oss(file_bytes: bytes, filename_prefix: str = "media/",
             logger.debug(
                 f"File type detected: {file_type}, extension: {file_extension}")
         else:
+            # 假设文件类型已知
+            file_type = 'audio/pcm'  # 根据实际情况设置
+            if file_type == 'audio/pcm':
+                # 将 PCM 数据转换为 WAV
+                wav_buffer = io.BytesIO()
+                with wave.open(wav_buffer, 'wb') as wav_file:
+                    wav_file.setnchannels(1)       # 单声道
+                    wav_file.setsampwidth(2)       # 16位
+                    wav_file.setframerate(16000)   # 16kHz
+                    wav_file.writeframes(file_bytes)
+                wav_data = wav_buffer.getvalue()
+                logger.debug(
+                    f"Converted PCM to WAV, size: {len(wav_data)} bytes")
             logger.debug(f"Using provided file extension: {file_extension}")
 
-        logger.debug(
-            f"extension: {file_extension}")
+        logger.debug(f"extension: {file_extension}")
 
         logger.debug("Initializing OSS client")
 
@@ -388,8 +401,16 @@ async def upload_file_to_oss(file_bytes: bytes, filename_prefix: str = "media/",
         logger.debug(f"Generated new filename: {new_filename}")
 
         # 上传文件到OSS
-        logger.debug(f"Uploading {file_extension} file to OSS")
-        bucket.put_object(new_filename, file_bytes)
+        if file_type == 'audio/pcm':
+            # 上传转换后的 WAV 数据
+            logger.debug(f"Uploading WAV file to OSS")
+            bucket.put_object(new_filename, wav_data, headers={
+                              'Content-Type': 'audio/wav'})
+        else:
+            # 上传原始文件
+            logger.debug(f"Uploading {file_extension} file to OSS")
+            bucket.put_object(new_filename, file_bytes, headers={
+                              'Content-Type': file_type})
 
         oss_path = f"https://{bucket_name}.{endpoint}/{new_filename}"
         logger.debug(f"File uploaded successfully to: {oss_path}")
@@ -401,4 +422,5 @@ async def upload_file_to_oss(file_bytes: bytes, filename_prefix: str = "media/",
     except Exception as e:
         logger.error(f"Failed to upload file to OSS: {e}")
         raise HTTPException(
-            status_code=500, detail=f"Internal server error during file upload: {str(e)}")
+            status_code=500, detail=f"Internal server error during file upload: {str(e)}"
+        )

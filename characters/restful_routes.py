@@ -223,7 +223,7 @@ async def upload_file(file: UploadFile = File(...), user=Depends(get_current_use
 
 
 @router.post("/uploadfile")
-async def upload_file(file: UploadFile = File(...)):
+async def upload_file(file: UploadFile = File(...), fileType: str = Form(...)):
     # TODO Check user
     # if not user:
     #     raise HTTPException(
@@ -231,14 +231,15 @@ async def upload_file(file: UploadFile = File(...)):
     #         detail="Invalid authentication credentials",
     #         headers={"WWW-Authenticate": "Bearer"},
     #     )
-
     contents = await file.read()
-
-    # Create a filename prefix with a timestamp to avoid duplicate filenames
-    filename_prefix = f"user_upload/{datetime.datetime.now().strftime('%Y%m%d-%H%M%S')}-"
-
     try:
-        oss_path = await upload_file_to_oss(contents, filename_prefix)
+        # 根据 fileType 动态设置文件扩展名
+        extension = fileType.split('/')[1] if '/' in fileType else 'bin'
+        filename_prefix = f"user_upload/{datetime.datetime.now().strftime('%Y%m%d-%H%M%S')}-"
+        filename = f"{filename_prefix}{uuid.uuid4()}.{extension}"
+
+        # 上传到 OSS
+        oss_path = await upload_file_to_oss(contents, filename, fileType)
     except Exception as e:
         raise HTTPException(
             status_code=http_status.HTTP_500_INTERNAL_SERVER_ERROR,

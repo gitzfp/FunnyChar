@@ -65,3 +65,5 @@ mysql-connector-python
 oss2
 passlib
 bcrypt
+funasr
+pydantic_settings

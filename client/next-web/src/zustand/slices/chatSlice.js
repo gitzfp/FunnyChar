@@ -12,27 +12,27 @@ export const createChatSlice = (set, get) => ({
       }));
   },
 
-  messageId: '',
-  setMessageId: (id) => {
-    set({messageId: id});
-  },
-
   chatContent: [],
 
   appendChatContent: (messageId, messageObj = {}) => {
     set((state) => {
         // 查找是否有相同 messageId 的消息
-        const {audioUrl, speechResult} = messageObj
+        const {audioUrl, speechResult, text, appendOrUpdate} = messageObj
         const chatIndex = state.chatContent.findIndex(chat => chat.messageId === messageId);
-
         if (chatIndex !== -1) {
             // 更新现有的消息
             const updatedChatContent = [...state.chatContent];
+            const updateContent = appendOrUpdate === 'append' ? updatedChatContent[chatIndex].content + text : text;
             if (audioUrl) {
                 updatedChatContent[chatIndex] = {
                     ...updatedChatContent[chatIndex],
-                    text: messageObj.text,
                     audioUrl: audioUrl,
+                };
+            }
+            if(text){
+                updatedChatContent[chatIndex] = {
+                    ...updatedChatContent[chatIndex],
+                    content: updateContent,
                 };
             }
             if(speechResult){
@@ -41,10 +41,7 @@ export const createChatSlice = (set, get) => ({
                     speechResult: speechResult,
                 };
             }
-            console.log(`收到消息客户端消息:`, {
-                chatContent: updatedChatContent,
-                interimChat: null,
-            })
+           
             return {
                 chatContent: updatedChatContent,
                 interimChat: null,
@@ -52,11 +49,12 @@ export const createChatSlice = (set, get) => ({
         } else {
             // 如果没有找到相同的 messageId，追加新的消息
             const interimChat = { ...state.interimChat, messageId: messageId };
-
+            if(text){
+               interimChat.content = text; 
+            }
             if (audioUrl) {
                 interimChat.audioUrl = audioUrl;
             }
-            console.log(`收到服务端消息=====`,interimChat,[...state.chatContent, interimChat])
             return {
                 chatContent: [...state.chatContent, interimChat],
                 interimChat: null,
@@ -69,11 +67,7 @@ export const createChatSlice = (set, get) => ({
           chatContent: [...state.chatContent, {timestamp: `${Date.now()}`, from: 'user', content: chat}]
       }));
   },
-  appendChatMsg: (chat) => {
-    set((state) => ({
-      chatContent: [...state.chatContent, { timestamp: `${Date.now()}`, from: 'message', content: chat }]
-    }));
-  },
+
   clearChatContent: () => {
       set({chatContent: [], interimChat: null});
   },

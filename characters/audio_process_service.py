@@ -44,46 +44,6 @@ class AudioProcessService:
         else:
             return None
 
-    async def process_audio(self, binary_data, platform, character, message_id, websocket, manager):
-        try:
-            logging.info(
-                f"=====process_audio1:Message sent to client"
-            )
-            # 并发执行上传和转录任务
-            transcript, audio_url = await asyncio.gather(
-                asyncio.to_thread(
-                    self.speech_to_text_instance.transcribe,
-                    binary_data,
-                    platform=platform,
-                    prompt=character.name,
-                    language=None,
-                ),  # 去除转录文本首尾的空白字符,
-                upload_file_to_oss(binary_data, "media/", ".wav")
-            )
-            logging.info(
-                f"=====process_audio2:Message sent to client: text = {transcript}, "
-            )
-            # 去除转录文本的两端空白字符
-            transcript = transcript.strip()
-
-            await manager.send_message(
-                message=f"[+transcript_audio]"
-                f"?text={transcript}"
-                f"&audioUrl={audio_url}"
-                f"&messageId={message_id}",
-                websocket=websocket,
-            )
-            logging.info(
-                f"=====process_audio3:Message sent to client: text = {transcript}, "
-                f"audioUrl = {audio_url}, messageId = {message_id}"
-            )
-
-            return transcript, audio_url
-
-        except Exception as e:
-            print(f"An error occurred: {e}")
-            return None, None  # 处理异常时返回 None 或者其他默认值
-
     async def send_score(self, binary_data: bytes, transcript: str, message_id, websocket, manager):
         try:
 

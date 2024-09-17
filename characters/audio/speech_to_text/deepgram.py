@@ -75,6 +75,7 @@ class DeepgramTranscriber(Singleton, SpeechToText):
         options = PrerecordedOptions(
             model=config.model,
             smart_format=True,
+            detect_language=True,
         )
 
         try:
