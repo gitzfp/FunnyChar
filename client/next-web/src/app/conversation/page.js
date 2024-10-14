@@ -14,7 +14,6 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useAppStore } from '@/zustand/store';
 import lz from 'lz-string';
 import { playAudios } from '@/util/audioUtils';
-import { v4 as uuidv4 } from 'uuid'; // 导入 UUID 库
 
 export default function Conversation() {
   const router = useRouter();
@@ -24,7 +23,7 @@ export default function Conversation() {
   const { character, getAudioList, setCharacter, clearChatContent } =
     useAppStore();
   // Websocket.
-  const { socketIsOpen, sendOverSocket, connectSocket, closeSocket } =
+  const { socketIsOpen, connectSocket, closeSocket } =
     useAppStore();
   // Media recorder.
   const {
@@ -47,8 +46,6 @@ export default function Conversation() {
     rtcConnectionEstablished,
   } = useAppStore();
   const { selectedMicrophone, selectedSpeaker } = useAppStore();
-  const { vadEvents, vadEventsCallback, disableVAD, enableVAD, closeVAD } =
-    useAppStore();
 
   useEffect(
     () =>
@@ -87,42 +84,9 @@ export default function Conversation() {
       .then(() => {
         connectPeer().then(() => {
           connectMicrophone();
-          initializeVAD();
         });
       });
   }, [selectedMicrophone]);
-
-  function initializeVAD() {
-    const clientMsgId = uuidv4();
-    if (vadEvents) {
-      closeVAD();
-    }
-    vadEventsCallback(
-      () => {
-        stopAudioPlayback();
-        startRecording();
-      },
-      () => {
-        // Stops recording and send interim audio clip to server.
-          const finalData = {
-            type: '[&Speech]',
-            clientMsgId: clientMsgId
-          };
-          sendOverSocket(JSON.stringify(finalData)); 
-          stopRecording();
-        },
-      () => {
-        const finalData = {
-            type: '[SpeechFinished]',
-            clientMsgId: clientMsgId
-          };
-        sendOverSocket(JSON.stringify(finalData)); 
-      }
-    );
-    if (!isTextMode && !disableMic) {
-      enableVAD();
-    }
-  }
 
   // Reconnects websocket on setting change.
   const {
@@ -136,7 +100,6 @@ export default function Conversation() {
     closeSocket();
     clearChatContent();
     connectSocket();
-    initializeVAD();
   }, [
     preferredLanguage,
     selectedModel,
@@ -169,18 +132,15 @@ export default function Conversation() {
   function handsFreeMode() {
     setIsTextMode(false);
     if (!disableMic) {
-      enableVAD();
     }
   }
 
   function textMode() {
     setIsTextMode(true);
-    disableVAD();
   }
 
   const cleanUpStates = () => {
-    disableVAD();
-    closeVAD();
+ 
     stopAudioPlayback();
     stopRecording();
     closePeer();
