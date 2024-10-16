@@ -28,7 +28,7 @@ export const createRecorderSlice = (set, get) => ({
       appid: config.appId,
       engine_model_type: '16k_zh',
       needvad: 1, // 启用 VAD
-      vad_silence_time: 1500, // 设置静音时长为 1500 毫秒
+      vad_silence_time: 1000, // 设置静音时长为 1000 毫秒
     };
 
     // 初始化腾讯云语音识别实例

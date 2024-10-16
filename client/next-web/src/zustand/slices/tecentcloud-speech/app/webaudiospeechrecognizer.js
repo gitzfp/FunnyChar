@@ -126,9 +126,9 @@ export default class WebAudioSpeechRecognizer {
         if (this.speechRecognizer && !this.isNormalEndStop) {
           this.OnError(res);
         }
-        this.speechRecognizer = null;
-        this.recorder && this.recorder.stop();
-        this.isCanSendData = false;
+        // this.speechRecognizer = null;
+        // this.recorder && this.recorder.stop();
+        // this.isCanSendData = false;
       };
       // 建立连接
       this.speechRecognizer.start();
