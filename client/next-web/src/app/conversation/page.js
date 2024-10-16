@@ -28,8 +28,6 @@ export default function Conversation() {
   // Media recorder.
   const {
     mediaRecorder,
-    connectMicrophone,
-    startRecording,
     stopRecording,
   } = useAppStore();
   // Audio player
@@ -83,7 +81,6 @@ export default function Conversation() {
       .then()
       .then(() => {
         connectPeer().then(() => {
-          connectMicrophone();
         });
       });
   }, [selectedMicrophone]);

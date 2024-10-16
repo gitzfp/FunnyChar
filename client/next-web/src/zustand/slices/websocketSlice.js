@@ -25,14 +25,12 @@ export const createWebsocketSlice = (set, get) => ({
           const params = new URLSearchParams(message.substring(message.indexOf('?')));
           const text = params.get('text');
           const speech = params.get('speech');
-          console.log("websocketSlice======[end]:", message, "text:",text, "speech:",speech)
           const currentState = get();
           const appendOrUpdate = params.get('appendOrUpdate');
           if(params.get('from')){
               currentState.setSender(params.get('from')); 
           }
-          console.log("websocketSlice======[end]:", message, "text:",text, "speech:",speech)
-           // 追加或更新聊天内容
+         // 追加或更新聊天内容
           currentState.appendChatContent(messageId, {
             text,
             appendOrUpdate

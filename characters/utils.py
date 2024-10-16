@@ -330,7 +330,7 @@ def get_image_type(file_bytes: bytes) -> str:
         return ""
 
 
-async def upload_file_to_oss(file_bytes: bytes, filename_prefix: str = "media/", file_extension=None) -> str:
+async def upload_file_to_oss(file_bytes: bytes, filename_prefix: str = "user_upload/", file_extension=None) -> str:
     """
     验证并上传音频或图片文件到阿里云OSS.
 
@@ -346,31 +346,24 @@ async def upload_file_to_oss(file_bytes: bytes, filename_prefix: str = "media/",
         # 检查文件类型
         if not file_extension:
             file_type, file_extension = check_file_type(file_bytes)
-            logger.debug(
-                f"File type detected: {file_type}, extension: {file_extension}")
+            logger.debug(f"File type detected: {file_type}, extension: {file_extension}")
         else:
-            # 假设文件类型已知
-            file_type = 'audio/pcm'  # 根据实际情况设置
-            if file_type == 'audio/pcm':
-                # 将 PCM 数据转换为 WAV
-                wav_buffer = io.BytesIO()
-                with wave.open(wav_buffer, 'wb') as wav_file:
-                    wav_file.setnchannels(1)       # 单声道
-                    wav_file.setsampwidth(2)       # 16位
-                    wav_file.setframerate(16000)   # 16kHz
-                    wav_file.writeframes(file_bytes)
-                wav_data = wav_buffer.getvalue()
-                logger.debug(
-                    f"Converted PCM to WAV, size: {len(wav_data)} bytes")
-            logger.debug(f"Using provided file extension: {file_extension}")
+            # 根据提供的扩展名判断文件类型
+            if file_extension.lower() == '.wav':
+                file_type = 'audio/wav'
+            elif file_extension.lower() == '.pcm':
+                file_type = 'audio/pcm'
+            else:
+                file_type = 'application/octet-stream'  # 默认二进制流类型
+            logger.debug(f"Using provided file extension: {file_extension}, file type: {file_type}")
 
-        logger.debug(f"extension: {file_extension}")
+        logger.debug(f"Received file_extension: {file_extension}")
+        logger.debug(f"File type detected: {file_type}")
 
         logger.debug("Initializing OSS client")
 
         access_key_id = os.getenv('ALIYUN_ACCESS_KEY_ID')
-        access_key_secret = os.getenv(
-            'ALIYUN_ACCESS_KEY_SECRET', 'xxcNZWIAQmUqeoW1TaIekQz9WGyOsW')
+        access_key_secret = os.getenv('ALIYUN_ACCESS_KEY_SECRET', 'xxcNZWIAQmUqeoW1TaIekQz9WGyOsW')
         bucket_name = os.getenv('ALIYUN_BUCKET_NAME')
         endpoint = os.getenv('ALIYUN_OSS_ENDPOINT')
 
@@ -393,24 +386,34 @@ async def upload_file_to_oss(file_bytes: bytes, filename_prefix: str = "media/",
         auth = oss2.Auth(access_key_id, access_key_secret)
         bucket = oss2.Bucket(auth, endpoint, bucket_name)
 
-        new_filename = (
-            f"{filename_prefix}"
-            f"{datetime.datetime.now().strftime('%Y%m%d-%H%M%S')}-"
-            f"{uuid.uuid4()}{file_extension}"
-        )
+        # 修改文件名生成逻辑
+        timestamp = datetime.datetime.now().strftime('%Y%m%d-%H%M%S')
+        unique_id = str(uuid.uuid4())
+        
+        # 确保文件扩展名以点开头
+        if file_extension and not file_extension.startswith('.'):
+            file_extension = '.' + file_extension
+
+        # 生成文件名
+        new_filename = f"{filename_prefix}{timestamp}-{unique_id}{file_extension}"
         logger.debug(f"Generated new filename: {new_filename}")
 
         # 上传文件到OSS
         if file_type == 'audio/pcm':
-            # 上传转换后的 WAV 数据
-            logger.debug(f"Uploading WAV file to OSS")
-            bucket.put_object(new_filename, wav_data, headers={
-                              'Content-Type': 'audio/wav'})
+            # 将 PCM 数据转换为 WAV
+            wav_buffer = io.BytesIO()
+            with wave.open(wav_buffer, 'wb') as wav_file:
+                wav_file.setnchannels(1)       # 单声道
+                wav_file.setsampwidth(2)       # 16位
+                wav_file.setframerate(16000)   # 16kHz
+                wav_file.writeframes(file_bytes)
+            wav_data = wav_buffer.getvalue()
+            logger.debug(f"Converted PCM to WAV, size: {len(wav_data)} bytes")
+            bucket.put_object(new_filename, wav_data, headers={'Content-Type': 'audio/wav'})
         else:
             # 上传原始文件
             logger.debug(f"Uploading {file_extension} file to OSS")
-            bucket.put_object(new_filename, file_bytes, headers={
-                              'Content-Type': file_type})
+            bucket.put_object(new_filename, file_bytes, headers={'Content-Type': file_type})
 
         oss_path = f"https://{bucket_name}.{endpoint}/{new_filename}"
         logger.debug(f"File uploaded successfully to: {oss_path}")

@@ -1,5 +1,4 @@
 import { getApiServerUrl } from '@/util/urlUtil';
-import AudioRecorder from './AudioRecorder';
 import { v4 as uuidv4 } from 'uuid'; // 导入 UUID 库
 import WebAudioSpeechRecognizer from './tecentcloud-speech/app/webaudiospeechrecognizer'; // 请根据实际路径调整
 import { config, signCallback } from './tecentcloud-speech/config'; // 导入腾讯云配置
@@ -13,39 +12,7 @@ export const createRecorderSlice = (set, get) => ({
   mediaRecorder: null,
   webAudioSpeechRecognizer: null, // 添加腾讯云语音识别实例
   transcriptionResult: '', // 存储识别结果文本
-  audioBlob: null, // 存储音频 Blob
   clientMsgId: '',
-
-  // 初始化麦克风（如果需要录制音频文件上传）
-  connectMicrophone: () => {
-    const deviceId = get().selectedMicrophone?.values().next().value;
-    if (get().mediaRecorder) return;
-    navigator.mediaDevices
-      .getUserMedia({
-        audio: {
-          deviceId: deviceId ? deviceId : undefined,
-        },
-      })
-      .then(stream => {
-        const mediaRecorder = new AudioRecorder(stream);
-        set({
-          mediaRecorder: mediaRecorder,
-        });
-      })
-      .catch(function (err) {
-        console.log('An error occurred: ' + err);
-        if (err.name === 'NotAllowedError') {
-          alert(
-            '权限被拒绝：请允许访问麦克风并刷新页面重试！'
-          );
-        } else if (err.name === 'NotFoundError') {
-          alert(
-            '未找到设备：请检查您的麦克风设备并刷新页面重试。'
-          );
-        }
-        get().stopRecording();
-      });
-  },
 
   // 开始录音和语音识别
   startRecording: () => {
@@ -71,19 +38,18 @@ export const createRecorderSlice = (set, get) => ({
     webAudioSpeechRecognizer.OnRecognitionStart = (res) => {
       console.log('开始识别', res);
       get().setIsRecording(true);
+
     };
     webAudioSpeechRecognizer.OnSentenceBegin = (res) => {
       console.log('一句话开始', res);
+      // get().webAudioSpeechRecognizer.clearCurrentAudioData()
       // 生成新的 clientMsgId
       const clientMsgId = uuidv4();
       set({ clientMsgId });
 
       // 清空之前的音频数据和文本
-      get().mediaRecorder?.clear();
       get().transcriptionResult && set({ transcriptionResult: '' });
-
-      // 开始录制当前句子的音频
-      get().mediaRecorder?.start();
+ 
     };
     webAudioSpeechRecognizer.OnRecognitionResultChange = (res) => {
       console.log('识别结果变化', res);
@@ -94,11 +60,6 @@ export const createRecorderSlice = (set, get) => ({
       console.log('一句话结束', res);
       const resultText = res.result.voice_text_str;
       set({ transcriptionResult: resultText });
-
-      // 停止录制，获取音频 Blob
-      get().mediaRecorder?.stop();
-      const audioBlob = get().mediaRecorder?.getBlob();
-      set({ audioBlob });
 
       // 一句话识别结束，调用 sendFinalData
       get().sendFinalData();
@@ -124,25 +85,20 @@ export const createRecorderSlice = (set, get) => ({
   },
 
   // 停止录音和语音识别
-  stopRecording: () => {
+  stopRecording: async() => {
     console.log('停止录音');
-    const { webAudioSpeechRecognizer, mediaRecorder } = get();
+    const { webAudioSpeechRecognizer } = get();
+    await get().sendFinalData();
     if (webAudioSpeechRecognizer) {
       webAudioSpeechRecognizer.stop();
       set({ webAudioSpeechRecognizer: null });
-    }
-    if (mediaRecorder) {
-      mediaRecorder.stop();
-      // 保存音频 Blob
-      const audioBlob = mediaRecorder.getBlob();
-      set({ audioBlob });
     }
     get().setIsRecording(false);
   },
 
   // 发送最终的数据（音频和转录文本）
   sendFinalData: async () => {
-    const { audioBlob, transcriptionResult, clientMsgId } = get();
+    const { webAudioSpeechRecognizer, transcriptionResult, clientMsgId } = get();
     const websocket = get().socket;
     if (!websocket || websocket.readyState !== WebSocket.OPEN) {
       console.log('WebSocket 未就绪');
@@ -162,7 +118,10 @@ export const createRecorderSlice = (set, get) => ({
     };
     websocket.send(JSON.stringify(transcriptionData));
     console.log('发送转录文本:', transcriptionData);
-
+    const audioData = webAudioSpeechRecognizer.getCurrentAudioData()
+    const audioBlob = new Blob(audioData, {type: 'audio/pcm'})
+    console.log('audioBlob:', audioBlob ,'webAudioSpeechRecognizer音频:', audioData)
+    webAudioSpeechRecognizer.clearCurrentAudioData()
     // 2. 如果需要上传音频文件，执行以下步骤
     if (audioBlob) {
       const formData = new FormData();
@@ -198,6 +157,6 @@ export const createRecorderSlice = (set, get) => ({
     }
 
     // 清理状态
-    set({ audioBlob: null, transcriptionResult: '', clientMsgId: '' });
+    set({ transcriptionResult: '', clientMsgId: '' });
   },
 });

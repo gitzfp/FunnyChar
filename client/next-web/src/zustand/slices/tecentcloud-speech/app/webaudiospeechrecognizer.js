@@ -11,13 +11,68 @@ export default class WebAudioSpeechRecognizer {
     this.audioData = [];
     this.isLog = isLog;
     this.requestId = null;
+    this.silentDuration = 0;
+    this.sampleRate = 1600; // Set to your actual sample rate
+    this.chunkDuration = 0; // Will calculate this based on data length
   }
+  getCurrentAudioData() {
+    return this.audioData
+  }
+  clearCurrentAudioData() {
+    this.audioData = []
+  }
+   // 静音检测方法
+  isSilent(data) {
+    const threshold = 5; // Adjusted silence threshold for Int8Array
+    const sum = data.reduce((acc, val) => acc + val * val, 0);
+    const rms = Math.sqrt(sum / data.length);
+    return rms < threshold;
+  }
+
+  isSilent1(data) {
+        // Normalize data from Int8Array (-128 to 127) to Float32Array (-1 to 1)
+        const normalizedData = new Float32Array(data.length);
+        for (let i = 0; i < data.length; i++) {
+          normalizedData[i] = data[i] / 128;
+        }
+
+        // Calculate RMS of normalized data
+        const sum = normalizedData.reduce((acc, val) => acc + val * val, 0);
+        const rms = Math.sqrt(sum / normalizedData.length);
+
+        // Set a stricter threshold for normalized data
+        const threshold = 0.1; // Adjust this value as needed
+
+        return rms < threshold;
+    }
+
   start() {
     try {
       this.isLog && console.log('start function is click');
       this.requestId = guid();
       this.recorder = new WebRecorder(this.requestId, this.isLog);
       this.recorder.OnReceivedData = (data) => {
+        const isSilent = this.isSilent1(data);
+          // Calculate chunk duration if not already set
+        if (!this.chunkDuration) {
+          this.chunkDuration = data.length / this.sampleRate; // e.g., 1280 / 16000 = 0.08 sec
+        }
+
+        if (isSilent) {
+          // Increase silent duration
+          this.silentDuration += this.chunkDuration;
+          if (this.silentDuration >= 2) {
+            // Silence has lasted more than 1.5 seconds
+            this.isLog && console.log(`静音检测 for ${this.silentDuration.toFixed(2)} seconds`);
+            // Optionally, you can stop the recorder or speech recognizer here
+            return;
+          }
+        } else {
+          // Reset silent duration
+          this.silentDuration = 0;
+          this.audioData.push(data)
+          console.log('非静音：',data)
+        } 
         if (this.isCanSendData) {
           this.speechRecognizer && this.speechRecognizer.write(data);
         }

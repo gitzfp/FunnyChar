@@ -42,6 +42,9 @@ from characters.models.character import (
 from fastapi.responses import JSONResponse
 import aiofiles
 from characters.utils import upload_file_to_oss
+from characters.logger import get_logger
+
+logger = get_logger(__name__)
 
 
 router = APIRouter()
@@ -234,12 +237,12 @@ async def upload_file(file: UploadFile = File(...), fileType: str = Form(...)):
     contents = await file.read()
     try:
         # 根据 fileType 动态设置文件扩展名
-        extension = fileType.split('/')[1] if '/' in fileType else 'bin'
-        filename_prefix = f"user_upload/{datetime.datetime.now().strftime('%Y%m%d-%H%M%S')}-"
-        filename = f"{filename_prefix}{uuid.uuid4()}.{extension}"
-
+        extension = '.' + fileType.split('/')[1] if '/' in fileType else 'bin'
+        logger.debug(
+            f"文件类型: {fileType}, extension: {extension}")
+        filename_prefix = "user_upload/"
         # 上传到 OSS
-        oss_path = await upload_file_to_oss(contents, filename, fileType)
+        oss_path = await upload_file_to_oss(contents, filename_prefix, extension)
     except Exception as e:
         raise HTTPException(
             status_code=http_status.HTTP_500_INTERNAL_SERVER_ERROR,

@@ -27,7 +27,7 @@ export default function Chat() {
       block: 'center',
       inline: 'nearest'
     })
-    console.log('Chat消息变化:', chatContent)
+    // console.log('Chat消息变化:', chatContent)
   }, [chatContent])
 
   function handleEnded() {
