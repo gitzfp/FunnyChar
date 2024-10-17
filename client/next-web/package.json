@@ -10,7 +10,9 @@
   },
   "dependencies": {
     "@clerk/nextjs": "^5.2.14",
+    "@d-id/client-sdk": "^1.0.19-beta.125",
     "@heroicons/react": "^2.1.5",
+    "@heygen/streaming-avatar": "^2.0.6",
     "@nextui-org/avatar": "^2.0.21",
     "@nextui-org/react": "^2.1.13",
     "@react-three/drei": "9.75.0",
@@ -29,6 +31,7 @@
     "leva": "^0.9.35",
     "lz-string": "^1.5.0",
     "next": "^14.2.4",
+    "openai": "^4.68.0",
     "postcss": "8.4.28",
     "react": "18.2.0",
     "react-dom": "18.2.0",

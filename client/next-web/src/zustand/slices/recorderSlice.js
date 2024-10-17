@@ -12,6 +12,7 @@ export const createRecorderSlice = (set, get) => ({
   mediaRecorder: null,
   webAudioSpeechRecognizer: null, // 添加腾讯云语音识别实例
   transcriptionResult: '', // 存储识别结果文本
+  oneSentenceText: '',
   clientMsgId: '',
 
   // 开始录音和语音识别
@@ -59,7 +60,7 @@ export const createRecorderSlice = (set, get) => ({
     webAudioSpeechRecognizer.OnSentenceEnd = (res) => {
       console.log('一句话结束', res);
       const resultText = res.result.voice_text_str;
-      set({ transcriptionResult: resultText });
+      set({ transcriptionResult: resultText, oneSentenceText: resultText });
 
       // 一句话识别结束，调用 sendFinalData
       get().sendFinalData();
@@ -74,6 +75,7 @@ export const createRecorderSlice = (set, get) => ({
       console.log('识别错误', res);
       get().setIsRecording(false);
       set({ webAudioSpeechRecognizer: null });
+      get().startRecording()
       // 如有需要，处理额外的错误逻辑
     };
 
@@ -98,6 +100,10 @@ export const createRecorderSlice = (set, get) => ({
 
   // 发送最终的数据（音频和转录文本）
   sendFinalData: async () => {
+    console.log('是否自由模式：',get().isHandsFree, get().character.name)
+    if(get().isHandsFree){
+      return
+    }
     const { webAudioSpeechRecognizer, transcriptionResult, clientMsgId } = get();
     const websocket = get().socket;
     if (!websocket || websocket.readyState !== WebSocket.OPEN) {

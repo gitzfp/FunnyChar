@@ -71,7 +71,7 @@ export default class WebAudioSpeechRecognizer {
           // Reset silent duration
           this.silentDuration = 0;
           this.audioData.push(data)
-          console.log('非静音：',data)
+          console.log(this.isCanSendData,'非静音：',data)
         } 
         if (this.isCanSendData) {
           this.speechRecognizer && this.speechRecognizer.write(data);

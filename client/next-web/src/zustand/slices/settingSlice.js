@@ -6,6 +6,7 @@ export const createSettingSlice = (set, get) => ({
   selectedModel: new Set(['gpt-4o-mini']),
   isMute: false,
   disableMic: false,
+  isHandsFree: false,
   languageList: [
     'Auto Detect',
     'English',
@@ -34,6 +35,7 @@ export const createSettingSlice = (set, get) => ({
   ],
   speakerList: [],
   microphoneList: [],
+  recognitionResult: '',
   getAudioList: async () => {
     await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
     const res = await navigator.mediaDevices.enumerateDevices();
@@ -76,4 +78,10 @@ export const createSettingSlice = (set, get) => ({
   setDisableMic: (v) => {
     set({ disableMic: v });
   },
+  setIsHandsFree: (v) => {
+    set({ isHandsFree: v})
+  },
+  setRecognitionResult: (v) => {
+    set({ recognitionResult: v})
+  }
 });

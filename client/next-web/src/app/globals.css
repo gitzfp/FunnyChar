@@ -16,6 +16,32 @@
   }
 } */
 
+/* Add this CSS to your global styles or a CSS module */
+@keyframes ripple {
+  0% {
+    transform: scale(0.5);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(2.5);
+    opacity: 0;
+  }
+}
+
+.ripple-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.ripple-effect {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.1);
+  width: 100px;
+  height: 100px;
+  animation: ripple 1.5s infinite;
+}
+
 .conversation_container .react-input-emoji--container {
   background: transparent;
   border: 0;
