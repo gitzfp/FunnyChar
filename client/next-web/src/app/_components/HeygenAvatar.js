@@ -101,7 +101,7 @@ const HeygenAvatar = () => {
   }, [])
 
   return (
-    <div className="flex flex-col items-center gap-4 p-4">
+    <div className="h-full flex flex-col items-center gap-4 p-4">
       <div className="h-full max-w-3xl bg-black rounded-lg overflow-hidden">
         <video ref={videoRef} className="h-full bg-black" autoPlay playsInline  />
       </div>
