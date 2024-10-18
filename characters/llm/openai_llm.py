@@ -53,6 +53,7 @@ class OpenaiLlm(LLM):
         logger.debug(f"Character configuration: {character}")
 
         # 将 history 和 character.llm_system_prompt 结合起来
+        messages = []
         if len(character.system_prompt):
             messages = [
                 {"role": "system", "content": character.system_prompt}]
