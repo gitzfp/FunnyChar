@@ -1,3 +1,4 @@
+'use client'
 import { createContext, useContext, useEffect, useState } from "react";
 
 const backendUrl = "http://localhost:8000";
