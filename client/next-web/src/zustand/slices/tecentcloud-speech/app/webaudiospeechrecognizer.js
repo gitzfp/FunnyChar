@@ -1,5 +1,6 @@
 import WebRecorder from "./webrecorder.js";
 import { SpeechRecognizer, guid } from "./speechrecognizer.js";
+import VAD from "../lib/vad.js";
 
 export default class WebAudioSpeechRecognizer {
   constructor(params, isLog) {
@@ -14,66 +15,77 @@ export default class WebAudioSpeechRecognizer {
     this.silentDuration = 0;
     this.sampleRate = 1600; // Set to your actual sample rate
     this.chunkDuration = 0; // Will calculate this based on data length
+
+    this.isSpeaking = false
+    this.speakTimeout = null
   }
-  getCurrentAudioData() {
+  getCurrentAudioData = () => {
+    console.log('获取音频数据')
     return this.audioData
   }
-  clearCurrentAudioData() {
+  clearCurrentAudioData = () => {
+    console.log('清空音频数据')
     this.audioData = []
   }
-   // 静音检测方法
-  isSilent(data) {
-    const threshold = 5; // Adjusted silence threshold for Int8Array
-    const sum = data.reduce((acc, val) => acc + val * val, 0);
-    const rms = Math.sqrt(sum / data.length);
-    return rms < threshold;
+
+   startUserMedia(stream) {
+        // 创建 MediaStreamAudioSourceNode
+        window.AudioContext = window.AudioContext || window.webkitAudioContext;
+        let audioContext = new AudioContext();
+        let source = audioContext.createMediaStreamSource(stream);
+
+        // 设置选项
+        let options = {
+            source: source,
+            voice_stop: () => {
+                this.speakTimeout = setTimeout(() => {
+                    this.isSpeaking = false;
+                    console.log('是否在说话-结束说话：voice_stop');
+                }, 3000);
+            },
+            voice_start: () => {
+                console.log('是否在说话-开始说话：voice_start');
+                if (this.speakTimeout) {
+                    clearTimeout(this.speakTimeout);
+                    this.speakTimeout = null;
+                }
+                this.isSpeaking = true;
+            }
+        };
+        // 创建 VAD
+        new VAD(options);
   }
 
-  isSilent1(data) {
-        // Normalize data from Int8Array (-128 to 127) to Float32Array (-1 to 1)
-        const normalizedData = new Float32Array(data.length);
-        for (let i = 0; i < data.length; i++) {
-          normalizedData[i] = data[i] / 128;
-        }
+  vadDetect() {
+    navigator.getUserMedia = navigator.getUserMedia || 
+                             navigator.mozGetUserMedia || 
+                             navigator.webkitGetUserMedia;
+    navigator.getUserMedia({audio: true}, this.startUserMedia.bind(this), function(e) {
+        console.log("No live audio input in this browser: " + e);
+    });
+  }
 
-        // Calculate RMS of normalized data
-        const sum = normalizedData.reduce((acc, val) => acc + val * val, 0);
-        const rms = Math.sqrt(sum / normalizedData.length);
-
-        // Set a stricter threshold for normalized data
-        const threshold = 0.1; // Adjust this value as needed
-
-        return rms < threshold;
-    }
+ 
 
   start() {
     try {
       this.isLog && console.log('start function is click');
       this.requestId = guid();
       this.recorder = new WebRecorder(this.requestId, this.isLog);
+      this.vadDetect() 
       this.recorder.OnReceivedData = (data) => {
-        const isSilent = this.isSilent1(data);
-          // Calculate chunk duration if not already set
-        if (!this.chunkDuration) {
-          this.chunkDuration = data.length / this.sampleRate; // e.g., 1280 / 16000 = 0.08 sec
-        }
-
-        if (isSilent) {
-          // Increase silent duration
-          this.silentDuration += this.chunkDuration;
-          if (this.silentDuration >= 2) {
-            // Silence has lasted more than 1.5 seconds
-            this.isLog && console.log(`静音检测 for ${this.silentDuration.toFixed(2)} seconds`);
+        if (!this.isSpeaking) {
+            this.isLog && console.log("是否在说话"+self.isSpeaking, `静音检测 for ${this.silentDuration.toFixed(2)} seconds`);
             // Optionally, you can stop the recorder or speech recognizer here
             return;
-          }
         } else {
           // Reset silent duration
-          this.silentDuration = 0;
           this.audioData.push(data)
-          console.log(this.isCanSendData,'非静音：',data)
         } 
         if (this.isCanSendData) {
+          if(this.speechRecognizer.socket.readyState !== 1)return
+          // console.log(this.speechRecognizer.socket.readyState, "是否在说话"+this.isSpeaking,'非静音：',data)
+
           this.speechRecognizer && this.speechRecognizer.write(data);
         }
       };
@@ -141,9 +153,9 @@ export default class WebAudioSpeechRecognizer {
     if (this.recorder) {
       this.recorder.stop();
     }
-    // if (this.speechRecognizer) {
-    //   this.speechRecognizer.stop();
-    // }
+    if (this.speechRecognizer) {
+      this.speechRecognizer.stop();
+    }
   }
   destroyStream() {
     this.isLog && console.log('destroyStream function is click', this.recorder);

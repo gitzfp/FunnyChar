@@ -13,6 +13,7 @@ import { useAppStore } from '@/zustand/store';
 import lz from 'lz-string';
 import { playAudios } from '@/util/audioUtils';
 import HandsFreeMode from './_components/HandsFreeMode'; 
+import ClickToTalk from './_components/InputField/ClickToTalk';
 
 
 export default function Conversation() {
@@ -20,7 +21,6 @@ export default function Conversation() {
   const searchParams = useSearchParams();
   const [isTextMode, setIsTextMode] = useState(true);
   const {isHandsFree, setIsHandsFree} = useAppStore();
-  const [isAnimating, setIsAnimating] = useState(false); // 新增动画状态
 
   const { character, getAudioList, setCharacter, clearChatContent } = useAppStore();
   const { socketIsOpen, connectSocket, closeSocket } = useAppStore();
@@ -84,32 +84,10 @@ export default function Conversation() {
     }
   }, [audioContext, audioQueueRef.current?.length]);
 
-    useEffect(() => {
-    if (isAnimating) {
-      // Play sound
-      const audio = new Audio('call.m4a');
-      audio.play();
-
-      // Set a listener for when the audio ends
-      audio.onended = () => {
-        setIsAnimating(false); // 动画结束
-        setIsHandsFree(true); // 进入HandsFree模式，显示HeygenAvatar
-        startRecording();
-      };
-
-      // Optionally, you can add a visual animation here
-      // For example, you could add a CSS class to trigger a CSS animation
-    }
-  }, [isAnimating]);
 
   function handsFreeMode() {
     setIsTextMode(false)
-    setIsAnimating(true); // 开始动画
-    setTimeout(() => {
-      setIsAnimating(false); // 动画结束
-      setIsHandsFree(true); // 进入HandsFree模式，显示HeygenAvatar
-      startRecording()
-    }, 3000); // 假设动画持续3秒
+    setIsHandsFree(true); // 进入HandsFree模式，显示HeygenAvatar
   }
 
   function textMode() {
@@ -179,15 +157,7 @@ export default function Conversation() {
       <div className="h-full -mb-24">
         <div className="h-[80px] md:h-[100px]"></div>
         <div className="w-full md:px-0 mx-auto md:w-unit-9xl lg:w-[892px]">
-          {isAnimating && (
-            <div className="flex justify-center items-center h-64 relative">
-              <div className="ripple-container">
-                <div className="ripple-effect"></div>
-              </div>
-              <p className="text-lg font-semibold text-gray-700">Connecting...</p>
-            </div>
-          )}
-          {!isHandsFree && !isAnimating && <Chat />} {/* 隐藏 Chat 组件 */} 
+          {!isHandsFree && <Chat />} {/* 隐藏 Chat 组件 */} 
         </div>
       </div>
       <div className="fixed bottom-0 w-full bg-background">
@@ -195,7 +165,7 @@ export default function Conversation() {
           <TextMode isDisplay={!isHandsFree}/>
         </div>
       </div>
-      {!isAnimating && isHandsFree && <div className="fixed top-0 w-full h-full bg-background">
+      {isHandsFree && <div className="fixed top-0 w-full h-full bg-background">
           <HandsFreeMode/>
       </div>}
     </div>

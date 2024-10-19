@@ -179,9 +179,10 @@ async def handle_receive(
 ):
     tts_task = None  # 初始化 tts_task 以便后续检查
 
-    async def on_new_token(token, message_id, from_type, append_or_update="update"):
-        logger.info(f"on_new_token is called, token: {token}, message_id: {message_id}")
-        return await manager.send_message(message=f"[end={message_id}]\n?text={token}&from={from_type}&appendOrUpdate={append_or_update}", websocket=websocket)
+    async def on_new_token(token, message_id, from_type, append_or_update="update", is_end=False):
+        logger.info(
+            f"on_new_token is called, token: {token}, message_id: {message_id}&isEnd={is_end}")
+        return await manager.send_message(message=f"[end={message_id}]\n?text={token}&from={from_type}&appendOrUpdate={append_or_update}&isEnd={is_end}", websocket=websocket)
 
     try:
         conversation_history = ConversationHistory()
@@ -256,7 +257,7 @@ async def handle_receive(
             logger.info(
                 f"text_mode_tts_task_done_call_back is called, response: {response}, message_id: {message_id}")
             # Send response to client, indicates the response is done
-            await on_new_token(response, message_id, "character", "append")
+            await on_new_token(response, message_id, "character", "append", True)
             # Update conversation history
             conversation_history.user.append(msg_data)
             conversation_history.ai.append(response)
@@ -382,7 +383,7 @@ async def handle_receive(
 
                         # 发送响应给客户端，[=] 表示响应完成
                         await manager.send_message(message=f"[+transcript_audio]"
-                                                   f"?text={response}&from=character&messageId={server_message_id}", websocket=websocket)
+                                                   f"?text={response}&from=character&messageId={server_message_id}&isEnd={True}", websocket=websocket)
 
                         # 更新对话历史
                         conversation_history.user.append(transcript)

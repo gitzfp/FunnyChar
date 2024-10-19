@@ -25,7 +25,7 @@ config = types.SimpleNamespace(
         "headers": {
             "Accept": "audio/mpeg",
             "Content-Type": "application/json",
-            "xi-api-key": 'e91a2b0bb145ddc181dbb179056c601e',
+            "xi-api-key": os.environ.get('ELEVEN_LABS_API_KEY'),
         },
         "data": {
             "model_id": "eleven_monolingual_v1",
@@ -60,7 +60,7 @@ class ElevenLabs(Singleton, TextToSpeech):
             voice_id = "21m00Tcm4TlvDq8ikWAM"
 
         logger.info(
-            f"Streaming with voice_id: {voice_id}, language: {language}")
+            f"Streaming with voice_id: {voice_id}, language: {language}， 文本: {text}")
         headers = config.headers
         if language != "en-US":
             config.data["model_id"] = ELEVEN_LABS_MULTILINGUAL_MODEL

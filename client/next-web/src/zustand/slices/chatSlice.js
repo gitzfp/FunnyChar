@@ -17,7 +17,7 @@ export const createChatSlice = (set, get) => ({
   appendChatContent: (messageId, messageObj = {}) => {
     set((state) => {
         // 查找是否有相同 messageId 的消息
-        const {audioUrl, speechResult, text, appendOrUpdate} = messageObj
+        const {audioUrl, speechResult, text, appendOrUpdate, isEnd} = messageObj
         const chatIndex = state.chatContent.findIndex(chat => chat.messageId === messageId);
         if (chatIndex !== -1) {
             // 更新现有的消息
@@ -33,6 +33,7 @@ export const createChatSlice = (set, get) => ({
                 updatedChatContent[chatIndex] = {
                     ...updatedChatContent[chatIndex],
                     content: updateContent,
+                    isEnd: isEnd
                 };
             }
             if(speechResult){
@@ -51,6 +52,7 @@ export const createChatSlice = (set, get) => ({
             const interimChat = { ...state.interimChat, messageId: messageId };
             if(text){
                interimChat.content = text; 
+               interimChat.isEnd = isEnd
             }
             if (audioUrl) {
                 interimChat.audioUrl = audioUrl;

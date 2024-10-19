@@ -73,10 +73,7 @@ export const createRecorderSlice = (set, get) => ({
     };
     webAudioSpeechRecognizer.OnError = (res) => {
       console.log('识别错误', res);
-      get().setIsRecording(false);
-      set({ webAudioSpeechRecognizer: null });
-      get().startRecording()
-      // 如有需要，处理额外的错误逻辑
+      get().stopRecording()
     };
 
     // 保存识别实例到状态中
@@ -100,10 +97,6 @@ export const createRecorderSlice = (set, get) => ({
 
   // 发送最终的数据（音频和转录文本）
   sendFinalData: async () => {
-    console.log('是否自由模式：',get().isHandsFree, get().character.name)
-    if(get().isHandsFree){
-      return
-    }
     const { webAudioSpeechRecognizer, transcriptionResult, clientMsgId } = get();
     const websocket = get().socket;
     if (!websocket || websocket.readyState !== WebSocket.OPEN) {
@@ -124,10 +117,10 @@ export const createRecorderSlice = (set, get) => ({
     };
     websocket.send(JSON.stringify(transcriptionData));
     console.log('发送转录文本:', transcriptionData);
-    const audioData = webAudioSpeechRecognizer.getCurrentAudioData()
+    const audioData = webAudioSpeechRecognizer?.getCurrentAudioData()
     const audioBlob = new Blob(audioData, {type: 'audio/pcm'})
     console.log('audioBlob:', audioBlob ,'webAudioSpeechRecognizer音频:', audioData)
-    webAudioSpeechRecognizer.clearCurrentAudioData()
+    webAudioSpeechRecognizer?.clearCurrentAudioData()
     // 2. 如果需要上传音频文件，执行以下步骤
     if (audioBlob) {
       const formData = new FormData();

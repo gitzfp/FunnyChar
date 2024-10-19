@@ -229,7 +229,8 @@ def timed(func):
 def task_done_callback(task: asyncio.Task):
     exception = task.exception()
     if exception:
-        logger.error(f"Error in task {task.get_name()}: {exception}")
+        logger.error(
+            f"Error in task {task.get_name()}: {exception}", exc_info=True)
 
 
 async def upload_audio_to_gcs(audio_bytes: bytes, filename_prefix: str = "audio/") -> str:

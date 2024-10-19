@@ -78,7 +78,14 @@ class OpenaiLlm(LLM):
             user=self.conversation_id,
             stream=True  # Ensure streaming is enabled
         )
-
+        #TODO --> stream=False
+        # reply = response_stream.choices[0].message.content 
+        # logger.debug(
+        #     f"会话id:{self.conversation_id} opai_llm open响应: {reply}")
+        # await callback.on_llm_end(reply)
+        # if audioCallback is not None:
+        #     await audioCallback.on_llm_end(reply)  # 调用音频回调
+        # return reply
         reply = ""
         for message in response_stream:
             if isinstance(message, ChatCompletionChunk):

@@ -1,27 +1,23 @@
 import { Button } from '@nextui-org/react';
 import { BiMicrophone } from 'react-icons/bi';
 import { BsCheckLg } from 'react-icons/bs';
-import { useState } from 'react';
 import { useAppStore } from '@/zustand/store';
 import AudioWave from './AudioWave';
 
 export default function ClickToTalk({ className }) {
-  const [isTalking, setIsTalking] = useState(false);
-  const { startRecording, stopRecording } = useAppStore();
+  const { isRecording, startRecording, stopRecording } = useAppStore();
 
   function startTalk() {
-    setIsTalking(true);
     startRecording();
   }
 
   function stopTalk() {
-    setIsTalking(false);
     stopRecording();
   }
 
   return (
     <>
-      {!isTalking ? (
+      {!isRecording ? (
         <div className={className}>
           <Button
             isIconOnly
@@ -44,7 +40,7 @@ export default function ClickToTalk({ className }) {
             </div>
             <div className="flex flex-row bg-background items-center gap-2 px-2">
               <div className="grow bg-default/80 rounded-2xl">
-                <AudioWave isTalking={isTalking} />
+                <AudioWave isTalking={isRecording} />
               </div>
               <Button
                 isIconOnly
@@ -70,7 +66,7 @@ export default function ClickToTalk({ className }) {
               <BsCheckLg size="1.5em" />
             </Button>
             <div className="absolute -top-16 -ml-14 h-20 w-48 p-6 rounded-2xl bg-default/80">
-              <AudioWave isTalking={isTalking} />
+              <AudioWave isTalking={isRecording} />
             </div>
             <div className="backdrop absolute top-0 bottom-0 left-0 right-0 bg-background/10"></div>
           </div>

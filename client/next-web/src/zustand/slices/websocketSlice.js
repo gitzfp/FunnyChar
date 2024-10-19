@@ -24,8 +24,9 @@ export const createWebsocketSlice = (set, get) => ({
           const messageId = messageIdMatches[1];
           const params = new URLSearchParams(message.substring(message.indexOf('?')));
           const text = params.get('text');
-          const speech = params.get('speech');
+          const isEnd = params.get('isEnd') === 'True';  // 将字符串 'true' 转换为布尔值 true
           const currentState = get();
+          console.log(params.get('isEnd'),"收到参数:"+text)
           const appendOrUpdate = params.get('appendOrUpdate');
           if(params.get('from')){
               currentState.setSender(params.get('from')); 
@@ -33,7 +34,8 @@ export const createWebsocketSlice = (set, get) => ({
          // 追加或更新聊天内容
           currentState.appendChatContent(messageId, {
             text,
-            appendOrUpdate
+            appendOrUpdate,
+            isEnd: isEnd
           });
         }
       } else if(message.startsWith('[+transcript_audio]')) {
@@ -44,6 +46,7 @@ export const createWebsocketSlice = (set, get) => ({
             const audioUrl = params.get('audioUrl');
             const messageId = params.get('messageId');
             const speechResult = params.get('speechResult')
+            const isEnd = params.get('isEnd') === 'True';  // 将字符串 'true' 转换为布尔值 true
             const currentState = get();
 
             // 检查是否有中断的消息需要处理
@@ -57,12 +60,13 @@ export const createWebsocketSlice = (set, get) => ({
             if(params.get('from')){
               currentState.setSender(params.get('from')); 
             }
-            console.log(messageId,"...websocketSlice=收到[+transcript_audio]消息:", message,messageId)
+            console.log(isEnd,"...websocketSlice=收到[+transcript_audio]消息:", message,messageId)
             // 追加或更新聊天内容
             currentState.appendChatContent(messageId, {
               text,
               audioUrl,
-              speechResult: speechResult ? JSON.parse(speechResult) : ""
+              speechResult: speechResult ? JSON.parse(speechResult) : "",
+              isEnd
             });
             // 清除临时语音内容
             currentState.clearSpeechInterim(); 
@@ -71,9 +75,9 @@ export const createWebsocketSlice = (set, get) => ({
          }
       } 
     } else {
+      console.log(get().shouldPlayAudio, 'should not play audio', get().isMute);
       // binary data
       if (!get().shouldPlayAudio || get().isMute) {
-        console.log('should not play audio');
         return;
       }
       console.log('开始播放===========',  event.data.byteLength,)

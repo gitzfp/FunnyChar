@@ -17,6 +17,7 @@ export default function HandsFreeMode() {
   const { character } = useAppStore();
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
+  const { isRecording, startRecording, stopRecording } = useAppStore();
 
   useEffect(() => {
     const getMedia = async () => {
@@ -85,32 +86,52 @@ export default function HandsFreeMode() {
     }
   };
 
+  const handleRecordingToggle = () => {
+    if (isRecording) {
+      stopRecording();
+    } else {
+      startRecording();
+    }
+  };
+
   return (
-    <div className="flex flex-col h-screen">
-     <div className="flex-1">
-      {character.name === 'MetaServe-1' ? <DIDAvatar /> : <HeygenAvatar />}
+    <div className="flex flex-col h-screen relative">
+      <div className="flex-1">
+        {character.name === 'MetaServe-1' ? <DIDAvatar /> : <HeygenAvatar />}
       </div>
-      {character.name === 'MetaServe-1' && <div className="flex-1 relative">
-        {recognitionResult && (
-          <div className="absolute top-0 left-1/3 transform -translate-x-1/2 bg-white bg-opacity-80 text-black p-4 rounded shadow-lg">
-            {recognitionResult}
-          </div>
-        )}
-        <video
-          className="w-full h-full object-cover"
-          autoPlay
-          playsInline
-          muted
-          ref={videoRef}
-        />
-        <canvas ref={canvasRef} className="hidden" width={640} height={480}></canvas>
-        <button
-          className="absolute bottom-4 right-4 px-4 py-2 bg-blue-500 text-white rounded"
-          onClick={toggleCamera}
-        >
-          切换摄像头
-        </button>
-      </div>}
+        <div className="flex-1 relative">
+          {recognitionResult && (
+            <div className="absolute top-0 left-1/3 transform -translate-x-1/2 bg-white bg-opacity-80 text-black p-4 rounded shadow-lg">
+              {recognitionResult}
+            </div>
+          )}
+          <video
+            className="w-full h-full object-cover"
+            autoPlay
+            playsInline
+            muted
+            ref={videoRef}
+          />
+          <canvas ref={canvasRef} className="hidden" width={640} height={480}></canvas>
+          <button
+            className="absolute bottom-4 right-4 px-4 py-2 bg-blue-500 text-white rounded"
+            onClick={toggleCamera}
+          >
+            切换摄像头
+          </button>
+        </div>
+      
+      {/* 新增的悬浮录音按钮 */}
+      <button
+        className={`fixed bottom-20 right-4 w-16 h-16 rounded-full shadow-lg flex items-center justify-center transition-all duration-300 ${
+          isRecording ? 'bg-red-500' : 'bg-green-500'
+        }`}
+        onClick={handleRecordingToggle}
+      >
+        <span className="text-white text-2xl">
+          {isRecording ? '■' : '●'}
+        </span>
+      </button>
     </div>
   );
 }
