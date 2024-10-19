@@ -1,6 +1,6 @@
 import WebRecorder from "./webrecorder.js";
 import { SpeechRecognizer, guid } from "./speechrecognizer.js";
-import VAD from "../lib/vad.js";
+import VAD from "../utils/vad.js";
 
 export default class WebAudioSpeechRecognizer {
   constructor(params, isLog) {

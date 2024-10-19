@@ -1,4 +1,4 @@
-import '../lib/cryptojs.js';
+import '../utils/cryptojs.js';
 
 // 识别需要过滤的参数
 const needFiltrationParams = ['appid', 'secretkey', 'signCallback'];
