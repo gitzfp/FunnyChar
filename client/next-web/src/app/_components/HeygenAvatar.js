@@ -35,7 +35,7 @@ const HeygenAvatar = () => {
 
   // Helper function to fetch access token
   const fetchAccessToken = async () => {
-    const apiKey = 'ODA0YWFhODg4YmI5NDg5OTlmNmMzZWUyMWMwM2ZjNTAtMTcyOTMyOTE4Ng==';
+    const apiKey = 'N2Q5ZTg3MWViOTdkNDllYzk1ZTZlZDRlMzliMGE4MDUtMTcyOTM4NDc4NQ==';
     const response = await fetch(
       "https://api.heygen.com/v1/streaming.create_token",
       {
