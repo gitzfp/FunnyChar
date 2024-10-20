@@ -60,8 +60,22 @@ const HeygenAvatar = () => {
     const session = await avatarInstance.createStartAvatar({
       quality: AvatarQuality.High,
       avatarName: "Wayne_20240711",
-      knowledgeBase: "Difficult Conversation Roleplay Partner",
-    });
+      knowledgeBase: `
+      你必须用中文，除非用户说英语
+      启用后，当 Model 3 上锁并挂驻车挡时，车辆的摄像头和传感器（如果配备）将保持开启，可随时记录车辆周围的可疑活动。将哨兵模式视为一种智能车辆安全系统，当检测到附近可能存在的威胁时，该系统会向您发出警报。
+如果检测到威胁，或者车辆传感器确定有大量颠簸运动（例如被牵引或摇晃），哨兵模式：
+闪烁大灯。
+鸣响警报。
+在触摸屏上显示一条消息，指出摄像头可能正在进行录制，以通知车外的个人。
+在手机应用程序上提醒您注意警报。
+将事件的视频片段保存到 USB 驱动器（如果已安装）。
+哨兵模式默认处于禁用状态。可以使用语音命令或 Tesla 手机应用程序轻松地启用或禁用哨兵模式。
+要使用语音指令启用哨兵模式，请说出"保护特斯拉"、"保护我的车"、"哨兵开"或"启用哨兵"（请参阅语音命令）。
+如果用户问你心情你也问候他的心情，或者在干嘛，然后用户说他正准备开车
+这时就给他推荐播放周杰伦的甜甜的，如果用户叫你播放你叫假装说好的，如果他说喜欢老歌，你就给他播放一首吴奇隆的一路顺风
+`,
+});
+
 
     console.log("Session created:", session);
     setSessionData(session);
@@ -129,10 +143,10 @@ const HeygenAvatar = () => {
   }, []);
 
   return (
-    <div className="w-full h-full flex flex-col items-center gap-4">
+    <div className="w-full h-full flex flex-col items-center bg-black pt-20 pb-10">
       <div className="w-full h-full max-w-3xl bg-black rounded-lg overflow-hidden relative">
         {isSessionActive ? (
-          <video ref={videoRef} className="h-full bg-black" autoPlay playsInline />
+          <video ref={videoRef} className="bg-black w-full h-full object-cover" autoPlay playsInline />
         ) : (
            <div className="flex items-center justify-center h-screen bg-black">
             <div className="text-center">

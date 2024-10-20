@@ -1,11 +1,14 @@
 'use client'
+import { useMyCharacters } from '@/util/apiClient';
 import CharacterCard from './CharacterCard';
 import { useState, useRef } from 'react';
 
-export default function ExploreTab({ characters, isDisplay }) {
+export default function ExploreTab({ isDisplay }) {
   const display = isDisplay ? 'flex' : 'hidden';
   const [playingId, setPlayingId] = useState('');
   const audioRef = useRef(null);
+  const { characters } = useMyCharacters();
+
 
   function handlePlay(id, audio_url) {
     let playPromise;

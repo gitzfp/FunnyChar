@@ -30,7 +30,6 @@ export default function Tabs({ characters }) {
   return (
     <>
       <ExploreTab
-        characters={characters}
         isDisplay={tabNow === 'explore' || tabNow === 'community'}
       />
       {user && <MyTab isDisplay={tabNow === 'myCharacters'} />}
