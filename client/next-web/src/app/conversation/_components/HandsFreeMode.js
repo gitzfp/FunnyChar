@@ -1,7 +1,6 @@
 import { useAppStore } from '@/zustand/store';
 import { useState, useEffect, useRef } from 'react';
 import HeygenAvatar from '../../_components/HeygenAvatar';
-import DIDAvatar from '../../_components/DIDAvatar';
 import OpenAI from 'openai';
 
 const openai = new OpenAI({
@@ -14,7 +13,6 @@ export default function HandsFreeMode() {
   const [stream, setStream] = useState(null);
   const [isFrontCamera, setIsFrontCamera] = useState(true);
   const [recognitionResult, setRecognitionResult] = useState('');
-  const { character } = useAppStore();
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const { isRecording, startRecording, stopRecording } = useAppStore();

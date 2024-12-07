@@ -15,7 +15,7 @@ const DIDAvatar = (props) => {
   let srcObject = null;
 
   // 2. 定义Agent ID和认证信息
-  const agentId = 'agt_vX79jkK8';
+  const agentId = 'agt_YaFE0fm3';
 
   // 请确保不要在客户端代码中硬编码敏感信息，如JWT令牌。最好从服务器安全地获取或使用环境变量。
   const auth = {

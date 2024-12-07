@@ -103,6 +103,7 @@ export async function uploadFile(file, accessToken) {
   const url = getApiServerUrl() + '/uploadfile';
   const formData = new FormData();
   formData.append('file', file);
+  formData.append('fileType', file.type)
   const response = await fetch(url, {
     method: 'POST',
     headers: {

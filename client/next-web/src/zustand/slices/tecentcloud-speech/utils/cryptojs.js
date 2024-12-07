@@ -268,5 +268,6 @@ var CryptoJS = CryptoJS || function (g, l) {
   // var sha1_result = CryptoJS.HmacSHA1("helloword", key)
   // console.log('-------',sha1_result.toString())
 
-
-window && (window.CryptoJSTest = CryptoJS);
+if (typeof window !== 'undefined') {
+	window && (window.CryptoJSTest = CryptoJS);
+}

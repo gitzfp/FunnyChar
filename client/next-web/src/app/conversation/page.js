@@ -88,6 +88,7 @@ export default function Conversation() {
   function handsFreeMode() {
     setIsTextMode(false)
     setIsHandsFree(true); // 进入HandsFree模式，显示HeygenAvatar
+    startRecording(true)
   }
 
   function textMode() {

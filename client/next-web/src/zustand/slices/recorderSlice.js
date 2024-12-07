@@ -104,7 +104,7 @@ export const createRecorderSlice = (set, get) => ({
       return;
     }
 
-    if (!transcriptionResult || get().isHandsFree) {
+    if (!transcriptionResult) {
       console.log('没有可发送的转录文本或自由模式');
       return;
     }
